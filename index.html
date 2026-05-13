@@ -1,0 +1,2553 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JBCC ヘルスケア | 銀河鉄道 - ホスピタルショウ</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Orbitron:wght@400;500;700;900&display=swap');
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --color-bg: #0a0a1a;
+  --color-surface: #12122a;
+  --color-surface-glass: rgba(18, 18, 42, 0.7);
+  --color-primary: #6ee7ff;
+  --color-primary-dim: rgba(110, 231, 255, 0.15);
+  --color-accent: #c084fc;
+  --color-accent-dim: rgba(192, 132, 252, 0.15);
+  --color-gold: #fbbf24;
+  --color-gold-dim: rgba(251, 191, 36, 0.15);
+  --color-text: #e8e8f0;
+  --color-text-dim: rgba(232, 232, 240, 0.6);
+  --color-success: #34d399;
+  --color-blanc: #38bdf8;
+  --color-cloud: #a78bfa;
+  --color-ai: #f472b6;
+  --color-consult: #fbbf24;
+  --glow-primary: 0 0 30px rgba(110, 231, 255, 0.3);
+  --glow-accent: 0 0 30px rgba(192, 132, 252, 0.3);
+  --radius: 16px;
+  --radius-lg: 24px;
+  --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ===== STARFIELD ===== */
+#starfield {
+  position: fixed; inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: white;
+  animation: twinkle var(--dur) ease-in-out infinite alternate;
+}
+@keyframes twinkle {
+  0% { opacity: var(--o1); transform: scale(1); }
+  100% { opacity: var(--o2); transform: scale(1.3); }
+}
+
+/* ===== NEBULA ===== */
+.nebula {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 0;
+}
+.nebula-1 { width: 600px; height: 600px; top: -100px; right: -200px; background: radial-gradient(circle, #6ee7ff, transparent 70%); }
+.nebula-2 { width: 800px; height: 500px; bottom: -100px; left: -200px; background: radial-gradient(circle, #c084fc, transparent 70%); }
+.nebula-3 { width: 500px; height: 500px; top: 40%; left: 50%; background: radial-gradient(circle, #f472b6, transparent 70%); }
+
+/* ===== MAIN CONTENT ===== */
+.app { position: relative; z-index: 1; }
+
+/* ===== SCREEN SYSTEM ===== */
+.screen {
+  display: none;
+  min-height: 100vh;
+  padding: 2rem;
+  animation: screenIn 0.6s var(--transition) both;
+}
+.screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+@keyframes screenIn {
+  from { opacity: 0; transform: translateY(40px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ===== HERO / WELCOME ===== */
+.hero {
+  text-align: center;
+  max-width: 1200px;
+  width: 100%;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  background: var(--color-primary-dim);
+  border: 1px solid rgba(110, 231, 255, 0.3);
+  border-radius: 100px;
+  font-size: 0.9rem;
+  color: var(--color-primary);
+  margin-bottom: 2rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-family: 'Orbitron', sans-serif;
+}
+.hero-badge .dot {
+  width: 8px; height: 8px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(110, 231, 255, 0.4); }
+  50% { opacity: 0.7; box-shadow: 0 0 0 8px rgba(110, 231, 255, 0); }
+}
+.hero-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2.5rem, 1rem + 6vw, 6rem);
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #6ee7ff 0%, #c084fc 50%, #f472b6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 30px rgba(110, 231, 255, 0.3));
+}
+.hero-subtitle {
+  font-size: clamp(1.2rem, 0.8rem + 1.5vw, 2rem);
+  font-weight: 300;
+  color: var(--color-text-dim);
+  margin-bottom: 1rem;
+}
+.hero-company {
+  font-size: clamp(1rem, 0.7rem + 1vw, 1.4rem);
+  color: var(--color-gold);
+  font-weight: 500;
+  margin-bottom: 3rem;
+  letter-spacing: 0.3em;
+}
+
+/* ===== AVATAR ===== */
+.avatar-container {
+  position: relative;
+  width: 200px; height: 200px;
+  margin: 0 auto 2rem;
+}
+.avatar-ring {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(110, 231, 255, 0.3);
+  animation: avatarRing 4s linear infinite;
+}
+.avatar-ring::before {
+  content: '';
+  position: absolute;
+  top: -4px; left: 50%;
+  width: 8px; height: 8px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--color-primary);
+}
+@keyframes avatarRing { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.avatar-ring-2 {
+  position: absolute; inset: -12px;
+  border-radius: 50%;
+  border: 1px solid rgba(192, 132, 252, 0.2);
+  animation: avatarRing 6s linear infinite reverse;
+}
+.avatar-ring-2::before {
+  content: '';
+  position: absolute;
+  top: -3px; left: 50%;
+  width: 6px; height: 6px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--color-accent);
+}
+.avatar-body {
+  position: absolute; inset: 16px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1a1a3e, #2a1a4e);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  box-shadow: inset 0 0 40px rgba(110, 231, 255, 0.1);
+}
+.avatar-face {
+  position: relative;
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center; flex-direction: column;
+}
+.avatar-eyes {
+  display: flex; gap: 24px;
+  margin-bottom: 8px;
+}
+.avatar-eye {
+  width: 18px; height: 18px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  box-shadow: 0 0 15px var(--color-primary), 0 0 30px rgba(110, 231, 255, 0.3);
+  animation: blink 4s ease-in-out infinite;
+  position: relative;
+}
+.avatar-eye::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 5px;
+  width: 6px; height: 6px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.8;
+}
+@keyframes blink {
+  0%, 45%, 55%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.1); }
+}
+.avatar-mouth {
+  width: 30px; height: 14px;
+  border: 2px solid var(--color-primary);
+  border-top: none;
+  border-radius: 0 0 20px 20px;
+  margin-top: 4px;
+  opacity: 0.8;
+}
+.avatar-mouth.speaking {
+  animation: speak 0.3s ease-in-out infinite alternate;
+}
+@keyframes speak {
+  0% { height: 8px; width: 24px; }
+  100% { height: 16px; width: 32px; }
+}
+.avatar-antenna {
+  position: absolute;
+  top: 8px; left: 50%;
+  transform: translateX(-50%);
+  width: 2px; height: 20px;
+  background: linear-gradient(to top, var(--color-primary), transparent);
+}
+.avatar-antenna::after {
+  content: '';
+  position: absolute;
+  top: -4px; left: -3px;
+  width: 8px; height: 8px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--color-accent);
+  animation: antennaPulse 2s ease-in-out infinite;
+}
+@keyframes antennaPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.7); }
+}
+
+/* Small avatar for other screens */
+.avatar-sm {
+  width: 80px; height: 80px;
+  position: fixed;
+  bottom: 2rem; right: 2rem;
+  z-index: 100;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+.avatar-sm:hover { transform: scale(1.1); }
+.avatar-sm .avatar-ring { border-width: 1.5px; }
+.avatar-sm .avatar-ring::before { width: 5px; height: 5px; top: -2px; }
+.avatar-sm .avatar-ring-2 { inset: -8px; }
+.avatar-sm .avatar-ring-2::before { width: 4px; height: 4px; top: -2px; }
+.avatar-sm .avatar-body { inset: 10px; }
+.avatar-sm .avatar-eyes { gap: 12px; margin-bottom: 4px; }
+.avatar-sm .avatar-eye { width: 8px; height: 8px; }
+.avatar-sm .avatar-eye::after { width: 3px; height: 3px; top: 1px; left: 2px; }
+.avatar-sm .avatar-mouth { width: 14px; height: 7px; margin-top: 2px; }
+.avatar-sm .avatar-antenna { height: 12px; top: 4px; }
+.avatar-sm .avatar-antenna::after { width: 5px; height: 5px; top: -2px; left: -1.5px; }
+
+/* ===== SPEECH BUBBLE ===== */
+.speech-bubble {
+  position: relative;
+  background: var(--color-surface-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(110, 231, 255, 0.2);
+  border-radius: var(--radius-lg);
+  padding: 2rem 2.5rem;
+  max-width: 800px;
+  width: 100%;
+  margin: 2rem auto;
+  font-size: clamp(1.1rem, 0.8rem + 1vw, 1.5rem);
+  line-height: 1.8;
+  text-align: center;
+  box-shadow: var(--glow-primary), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.speech-bubble::before {
+  content: '';
+  position: absolute;
+  top: -10px; left: 50%; transform: translateX(-50%);
+  border: 10px solid transparent;
+  border-bottom-color: rgba(110, 231, 255, 0.2);
+}
+.speech-typing {
+  display: inline;
+}
+.speech-cursor {
+  display: inline-block;
+  width: 3px; height: 1.2em;
+  background: var(--color-primary);
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: cursorBlink 1s step-end infinite;
+}
+@keyframes cursorBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* ===== CTA BUTTON ===== */
+.cta-btn {
+  display: inline-flex;
+  align-items: center; gap: 0.75rem;
+  padding: 1rem 2.5rem;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  color: var(--color-bg);
+  font-size: 1.2rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  box-shadow: 0 4px 20px rgba(110, 231, 255, 0.3);
+  font-family: 'Noto Sans JP', sans-serif;
+  margin-top: 1.5rem;
+}
+.cta-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 30px rgba(110, 231, 255, 0.5);
+}
+.cta-btn:active { transform: translateY(0) scale(0.98); }
+
+/* ===== SLIDESHOW ===== */
+.slideshow {
+  width: 100%;
+  max-width: 1100px;
+  margin: 2rem auto;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+}
+.slideshow-track {
+  display: flex;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.slide {
+  min-width: 100%;
+  padding: 3rem;
+  background: var(--color-surface-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(110, 231, 255, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+}
+.slide-visual {
+  flex: 0 0 300px;
+  height: 300px;
+  border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.slide-visual-icon {
+  font-size: 5rem;
+  filter: drop-shadow(0 0 20px currentColor);
+}
+.slide-visual::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at center, transparent 30%, rgba(10, 10, 26, 0.6) 100%);
+}
+.slide-content {
+  flex: 1;
+}
+.slide-station-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.8rem;
+  color: var(--color-primary);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.slide-title {
+  font-size: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+  font-weight: 900;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+.slide-desc {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: var(--color-text-dim);
+  margin-bottom: 1.5rem;
+}
+.slide-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.slide-tag {
+  padding: 0.3rem 0.8rem;
+  border-radius: 100px;
+  font-size: 0.8rem;
+  border: 1px solid;
+}
+.slideshow-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.slideshow-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: rgba(110, 231, 255, 0.2);
+  border: 1px solid rgba(110, 231, 255, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.slideshow-dot.active {
+  background: var(--color-primary);
+  box-shadow: 0 0 10px var(--color-primary);
+  transform: scale(1.3);
+}
+.slideshow-arrow {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  border: 1px solid rgba(110, 231, 255, 0.3);
+  background: var(--color-surface-glass);
+  color: var(--color-primary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s ease;
+}
+.slideshow-arrow:hover {
+  background: var(--color-primary-dim);
+  border-color: var(--color-primary);
+}
+
+/* ===== SCENARIO CARDS ===== */
+.scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 2rem auto;
+}
+.scenario-card {
+  position: relative;
+  background: var(--color-surface-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(110, 231, 255, 0.15);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  overflow: hidden;
+  text-align: left;
+}
+.scenario-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--card-accent, var(--color-primary));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.scenario-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--card-accent, var(--color-primary));
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3), 0 0 20px var(--card-glow, rgba(110, 231, 255, 0.1));
+}
+.scenario-card:hover::before { opacity: 1; }
+.scenario-card-icon {
+  width: 64px; height: 64px;
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem;
+  margin-bottom: 1.2rem;
+}
+.scenario-card-station {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+.scenario-card-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+}
+.scenario-card-desc {
+  font-size: 0.95rem;
+  color: var(--color-text-dim);
+  line-height: 1.6;
+}
+.scenario-card-arrow {
+  position: absolute;
+  bottom: 1.5rem; right: 1.5rem;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  opacity: 0.5;
+}
+.scenario-card:hover .scenario-card-arrow {
+  opacity: 1;
+  transform: translateX(4px);
+}
+
+/* ===== DETAIL SCREEN ===== */
+.detail-header {
+  text-align: center;
+  max-width: 800px;
+  margin-bottom: 2rem;
+}
+.detail-back {
+  display: inline-flex;
+  align-items: center; gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 100px;
+  border: 1px solid rgba(110, 231, 255, 0.2);
+  background: transparent;
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 2rem;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+.detail-back:hover {
+  background: var(--color-primary-dim);
+  border-color: var(--color-primary);
+}
+.detail-icon {
+  width: 100px; height: 100px;
+  border-radius: 24px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3rem;
+  margin: 0 auto 1.5rem;
+}
+.detail-station {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+.detail-title {
+  font-size: clamp(1.8rem, 1rem + 3vw, 3rem);
+  font-weight: 900;
+  margin-bottom: 1rem;
+}
+.detail-desc {
+  font-size: 1.1rem;
+  color: var(--color-text-dim);
+  line-height: 1.8;
+  max-width: 700px;
+  margin: 0 auto 2rem;
+}
+
+.detail-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto 2rem;
+}
+.detail-feature {
+  background: var(--color-surface-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(110, 231, 255, 0.1);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  text-align: left;
+}
+.detail-feature-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.detail-feature-desc {
+  font-size: 0.9rem;
+  color: var(--color-text-dim);
+  line-height: 1.6;
+}
+
+.detail-cta {
+  display: inline-flex;
+  align-items: center; gap: 0.75rem;
+  padding: 1rem 2.5rem;
+  border-radius: 100px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  font-family: 'Noto Sans JP', sans-serif;
+  color: var(--color-bg);
+  margin: 0.5rem;
+}
+.detail-cta:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.15);
+}
+.detail-cta-secondary {
+  background: transparent;
+  border: 1px solid rgba(110, 231, 255, 0.3);
+  color: var(--color-primary);
+}
+.detail-cta-secondary:hover {
+  background: var(--color-primary-dim);
+  border-color: var(--color-primary);
+}
+
+/* ===== TRAIN LINE ===== */
+.train-line {
+  position: relative;
+  max-width: 1000px;
+  width: 100%;
+  margin: 3rem auto;
+  padding: 2rem 0;
+}
+.train-track {
+  position: absolute;
+  top: 50%;
+  left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(110, 231, 255, 0.3), transparent);
+}
+.train-track::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 30%;
+  height: 4px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  border-radius: 2px;
+  animation: trainMove 8s linear infinite;
+  box-shadow: 0 0 15px var(--color-primary);
+}
+@keyframes trainMove {
+  0% { left: -30%; }
+  100% { left: 100%; }
+}
+.train-stations {
+  display: flex;
+  justify-content: space-around;
+  position: relative;
+  z-index: 1;
+}
+.train-station {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.train-station:hover { transform: translateY(-4px); }
+.train-station-dot {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--color-primary);
+  background: var(--color-bg);
+  box-shadow: 0 0 10px rgba(110, 231, 255, 0.3);
+  transition: all 0.3s ease;
+}
+.train-station:hover .train-station-dot {
+  background: var(--color-primary);
+  box-shadow: 0 0 20px var(--color-primary);
+}
+.train-station-name {
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: center;
+  max-width: 80px;
+}
+
+/* ===== AVATAR SPEECH FLOATING ===== */
+.avatar-speech-float {
+  position: fixed;
+  bottom: 7rem; right: 2rem;
+  max-width: 300px;
+  padding: 1rem 1.2rem;
+  background: var(--color-surface-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(110, 231, 255, 0.2);
+  border-radius: var(--radius) var(--radius) 4px var(--radius);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  z-index: 99;
+  box-shadow: var(--glow-primary);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.4s ease;
+  pointer-events: none;
+}
+.avatar-speech-float.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.avatar-speech-close {
+  position: absolute;
+  top: 0.3rem; right: 0.5rem;
+  background: none; border: none;
+  color: var(--color-text-dim);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* ===== STAFF AVATAR PANEL ===== */
+.staff-panel {
+  position: fixed;
+  bottom: 2rem; right: 2rem;
+  z-index: 100;
+  display: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+.staff-panel.visible { display: flex; }
+.staff-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 1.2rem 0.8rem 0.8rem;
+  background: rgba(12, 12, 30, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(110, 231, 255, 0.2);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4), var(--glow-primary);
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  min-width: 280px;
+}
+.staff-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(110, 231, 255, 0.4);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 40px rgba(110, 231, 255, 0.2);
+}
+.staff-photo-wrap {
+  position: relative;
+  width: 64px; height: 64px;
+  flex-shrink: 0;
+}
+.staff-photo-ring {
+  position: absolute; inset: -3px;
+  border-radius: 50%;
+  border: 2px solid rgba(110, 231, 255, 0.4);
+  animation: avatarRing 6s linear infinite;
+}
+.staff-photo {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  background: linear-gradient(135deg, #1e1e3a, #2a1a4e);
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.staff-photo.loaded { opacity: 1; }
+.staff-photo-placeholder {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1e1e3a, #2a1a4e);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--color-primary);
+  font-size: 1.4rem;
+  z-index: 0;
+}
+.staff-info {
+  flex: 1;
+  min-width: 0;
+}
+.staff-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 0.15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.staff-role {
+  font-size: 0.7rem;
+  color: var(--color-primary);
+  letter-spacing: 0.05em;
+}
+.staff-speech {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.2rem;
+  background: rgba(12, 12, 30, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(110, 231, 255, 0.2);
+  border-radius: var(--radius) var(--radius) 20px var(--radius);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4), var(--glow-primary);
+  max-width: 340px;
+  opacity: 0;
+  transform: translateY(8px) scale(0.97);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+.staff-speech.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+.staff-speech-close {
+  position: absolute;
+  top: 0.4rem; right: 0.6rem;
+  background: none; border: none;
+  color: var(--color-text-dim);
+  cursor: pointer;
+  font-size: 0.85rem;
+  z-index: 2;
+}
+.staff-speech-photo {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  flex-shrink: 0;
+  border: 1.5px solid rgba(110, 231, 255, 0.3);
+}
+.staff-speech-body {
+  flex: 1;
+  position: relative;
+}
+.staff-speech-name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 0.3rem;
+}
+.staff-speech-text {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--color-text);
+}
+.staff-robot {
+  width: 40px; height: 40px;
+  flex-shrink: 0;
+  position: relative;
+}
+.staff-robot .avatar-ring { border-width: 1px; }
+.staff-robot .avatar-ring::before { width: 3px; height: 3px; top: -1px; }
+.staff-robot .avatar-ring-2 { inset: -5px; border-width: 1px; }
+.staff-robot .avatar-ring-2::before { width: 3px; height: 3px; top: -1px; }
+.staff-robot .avatar-body { inset: 6px; }
+.staff-robot .avatar-eyes { gap: 6px; margin-bottom: 2px; }
+.staff-robot .avatar-eye { width: 5px; height: 5px; }
+.staff-robot .avatar-eye::after { width: 2px; height: 2px; top: 1px; left: 1px; }
+.staff-robot .avatar-mouth { width: 8px; height: 4px; border-width: 1px; margin-top: 1px; }
+.staff-robot .avatar-antenna { height: 7px; top: 2px; width: 1px; }
+.staff-robot .avatar-antenna::after { width: 3px; height: 3px; top: -1px; left: -1px; }
+.staff-indicator {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 0.1rem;
+}
+.staff-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(110, 231, 255, 0.2);
+  transition: all 0.3s ease;
+}
+.staff-dot.active {
+  background: var(--color-primary);
+  box-shadow: 0 0 6px var(--color-primary);
+}
+
+/* ===== BOOTH INTRO SCREEN (Avatar narrated) ===== */
+.booth-intro-container {
+  max-width: 1000px;
+  width: 100%;
+  text-align: center;
+}
+.booth-intro-avatar {
+  width: 140px; height: 140px;
+  margin: 0 auto 1.5rem;
+}
+.booth-intro-avatar .avatar-ring { border-width: 1.5px; }
+.booth-intro-avatar .avatar-ring::before { width: 6px; height: 6px; top: -3px; }
+.booth-intro-avatar .avatar-ring-2 { inset: -10px; }
+.booth-intro-avatar .avatar-ring-2::before { width: 5px; height: 5px; top: -2px; }
+.booth-intro-avatar .avatar-body { inset: 12px; }
+.booth-intro-avatar .avatar-eyes { gap: 16px; margin-bottom: 5px; }
+.booth-intro-avatar .avatar-eye { width: 12px; height: 12px; }
+.booth-intro-avatar .avatar-eye::after { width: 4px; height: 4px; top: 2px; left: 3px; }
+.booth-intro-avatar .avatar-mouth { width: 20px; height: 10px; margin-top: 3px; }
+.booth-intro-avatar .avatar-antenna { height: 14px; top: 5px; }
+.booth-intro-avatar .avatar-antenna::after { width: 6px; height: 6px; top: -3px; left: -2px; }
+
+/* ===== DEMO CHAT INTERFACE ===== */
+.demo-screen {
+  max-width: 900px;
+  width: 100%;
+  padding-top: 1rem;
+}
+.demo-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+.demo-header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 1rem;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-family: 'Orbitron', sans-serif;
+  margin-bottom: 1rem;
+}
+.demo-title {
+  font-size: clamp(1.4rem, 1rem + 2vw, 2.2rem);
+  font-weight: 900;
+  margin-bottom: 0.5rem;
+}
+.demo-subtitle {
+  font-size: 0.95rem;
+  color: var(--color-text-dim);
+}
+.demo-chat-area {
+  background: rgba(12, 12, 30, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(110, 231, 255, 0.12);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  min-height: 420px;
+  max-height: 520px;
+  overflow-y: auto;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  scroll-behavior: smooth;
+}
+.demo-chat-area::-webkit-scrollbar { width: 4px; }
+.demo-chat-area::-webkit-scrollbar-track { background: transparent; }
+.demo-chat-area::-webkit-scrollbar-thumb { background: rgba(110, 231, 255, 0.2); border-radius: 2px; }
+.chat-msg {
+  display: flex;
+  gap: 0.75rem;
+  max-width: 85%;
+  animation: chatIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes chatIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+.chat-msg.ai { align-self: flex-start; }
+.chat-msg.user { align-self: flex-end; flex-direction: row-reverse; }
+.chat-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  flex-shrink: 0;
+  border: 1.5px solid rgba(110, 231, 255, 0.3);
+}
+.chat-avatar.user-icon {
+  background: linear-gradient(135deg, rgba(110, 231, 255, 0.2), rgba(192, 132, 252, 0.2));
+  display: flex; align-items: center; justify-content: center;
+  border-color: rgba(192, 132, 252, 0.3);
+}
+.chat-bubble {
+  padding: 0.8rem 1.1rem;
+  border-radius: 16px 16px 16px 4px;
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+.chat-msg.ai .chat-bubble {
+  background: rgba(110, 231, 255, 0.08);
+  border: 1px solid rgba(110, 231, 255, 0.15);
+  color: var(--color-text);
+}
+.chat-msg.user .chat-bubble {
+  background: linear-gradient(135deg, rgba(192, 132, 252, 0.15), rgba(110, 231, 255, 0.1));
+  border: 1px solid rgba(192, 132, 252, 0.2);
+  border-radius: 16px 16px 4px 16px;
+  color: var(--color-text);
+}
+.chat-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+.chat-option-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 100px;
+  border: 1px solid rgba(110, 231, 255, 0.3);
+  background: rgba(110, 231, 255, 0.05);
+  color: var(--color-primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+.chat-option-btn:hover {
+  background: rgba(110, 231, 255, 0.15);
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+}
+.chat-option-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+.chat-option-btn.selected {
+  background: rgba(110, 231, 255, 0.2);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 10px rgba(110, 231, 255, 0.15);
+}
+.chat-typing-indicator {
+  display: flex;
+  gap: 4px;
+  padding: 0.8rem 1.1rem;
+}
+.chat-typing-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  opacity: 0.4;
+  animation: typingBounce 1.4s ease-in-out infinite;
+}
+.chat-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.chat-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+.demo-reset-btn {
+  display: inline-flex;
+  align-items: center; gap: 0.4rem;
+  padding: 0.5rem 1.2rem;
+  border-radius: 100px;
+  border: 1px solid rgba(110, 231, 255, 0.2);
+  background: transparent;
+  color: var(--color-text-dim);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+.demo-reset-btn:hover {
+  background: var(--color-primary-dim);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.demo-nav {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+/* Demo entry cards on welcome */
+.demo-entries {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+.demo-entry-card {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.7rem 1.2rem;
+  background: rgba(12, 12, 30, 0.6);
+  border: 1px solid rgba(110, 231, 255, 0.15);
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: var(--color-text);
+}
+.demo-entry-card:hover {
+  border-color: rgba(110, 231, 255, 0.4);
+  background: rgba(110, 231, 255, 0.08);
+  transform: translateY(-2px);
+}
+.demo-entry-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  border: 1.5px solid rgba(110, 231, 255, 0.3);
+}
+.demo-entry-text {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.demo-entry-sub {
+  font-size: 0.7rem;
+  color: var(--color-text-dim);
+}
+
+/* ===== PARTICLES ===== */
+.particle {
+  position: fixed;
+  width: 3px; height: 3px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+}
+
+/* ===== SHOOTING STAR ===== */
+.shooting-star {
+  position: fixed;
+  width: 100px; height: 1px;
+  background: linear-gradient(90deg, rgba(110, 231, 255, 0.8), transparent);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .slide { flex-direction: column; padding: 2rem; gap: 1.5rem; }
+  .slide-visual { flex: none; width: 100%; height: 180px; }
+  .scenario-grid { grid-template-columns: 1fr; }
+  .train-stations { flex-wrap: wrap; gap: 1.5rem; }
+  .train-track { display: none; }
+  .avatar-sm { width: 60px; height: 60px; bottom: 1rem; right: 1rem; }
+  .avatar-speech-float { right: 1rem; bottom: 5rem; max-width: 250px; }
+  .staff-panel { bottom: 1rem; right: 1rem; }
+  .staff-card { min-width: 220px; padding: 0.6rem 0.8rem 0.6rem 0.6rem; }
+  .staff-photo-wrap { width: 48px; height: 48px; }
+  .staff-photo { width: 48px; height: 48px; }
+  .staff-speech { max-width: 270px; }
+  .staff-speech-photo { width: 36px; height: 36px; }
+  .detail-features { grid-template-columns: 1fr; }
+  .demo-screen { padding-top: 0; }
+  .demo-chat-area { min-height: 350px; max-height: 420px; padding: 1rem; }
+  .chat-msg { max-width: 95%; }
+  .chat-avatar { width: 36px; height: 36px; }
+  .demo-entries { flex-direction: column; align-items: center; }
+}
+
+@media (min-width: 1600px) {
+  html { font-size: 18px; }
+}
+
+/* ===== UTILITY ===== */
+.text-primary { color: var(--color-primary); }
+.text-accent { color: var(--color-accent); }
+.text-gold { color: var(--color-gold); }
+.text-blanc { color: var(--color-blanc); }
+.text-cloud { color: var(--color-cloud); }
+.text-ai { color: var(--color-ai); }
+.text-consult { color: var(--color-consult); }
+.bg-blanc { background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(56, 189, 248, 0.05)); }
+.bg-cloud { background: linear-gradient(135deg, rgba(167, 139, 250, 0.2), rgba(167, 139, 250, 0.05)); }
+.bg-ai { background: linear-gradient(135deg, rgba(244, 114, 182, 0.2), rgba(244, 114, 182, 0.05)); }
+.bg-consult { background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(251, 191, 36, 0.05)); }
+.bg-partner { background: linear-gradient(135deg, rgba(52, 211, 153, 0.2), rgba(52, 211, 153, 0.05)); }
+.border-blanc { border-color: rgba(56, 189, 248, 0.3); }
+.border-cloud { border-color: rgba(167, 139, 250, 0.3); }
+.border-ai { border-color: rgba(244, 114, 182, 0.3); }
+.border-consult { border-color: rgba(251, 191, 36, 0.3); }
+.border-partner { border-color: rgba(52, 211, 153, 0.3); }
+
+.fade-in { animation: fadeIn 0.6s ease both; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; }
+.delay-5 { animation-delay: 0.5s; }
+</style>
+</head>
+<body>
+
+<!-- STARFIELD -->
+<div id="starfield"></div>
+<div class="nebula nebula-1"></div>
+<div class="nebula nebula-2"></div>
+<div class="nebula nebula-3"></div>
+
+<div class="app">
+
+  <!-- ===== SCREEN 1: WELCOME ===== -->
+  <div class="screen active" id="screen-welcome">
+    <div class="hero">
+      <div class="hero-badge"><span class="dot"></span> HOSPITAL SHOW 2026</div>
+      <div class="avatar-container" id="main-avatar">
+        <div class="avatar-ring"></div>
+        <div class="avatar-ring-2"></div>
+        <div class="avatar-body">
+          <div class="avatar-face">
+            <div class="avatar-antenna"></div>
+            <div class="avatar-eyes">
+              <div class="avatar-eye"></div>
+              <div class="avatar-eye"></div>
+            </div>
+            <div class="avatar-mouth" id="main-mouth"></div>
+          </div>
+        </div>
+      </div>
+      <h1 class="hero-title">銀河鉄道</h1>
+      <p class="hero-subtitle">ヘルスケアの未来へ、ご一緒に。</p>
+      <p class="hero-company">J B C C 株 式 会 社</p>
+      <div class="speech-bubble" id="welcome-speech">
+        <span class="speech-typing" id="welcome-text"></span>
+        <span class="speech-cursor"></span>
+      </div>
+      <button class="cta-btn" onclick="navigateTo('screen-booth-intro')">
+        乗車する
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+      <div class="demo-entries">
+        <div class="demo-entry-card" onclick="navigateTo('screen-demo-reception')">
+          <img class="demo-entry-avatar" src="avatars/nurse.png" alt="">
+          <div>
+            <div class="demo-entry-text">受付案内デモ</div>
+            <div class="demo-entry-sub">銀河鉄道病院</div>
+          </div>
+        </div>
+        <div class="demo-entry-card" onclick="navigateTo('screen-demo-consulting')">
+          <img class="demo-entry-avatar" src="avatars/consultant.png" alt="">
+          <div>
+            <div class="demo-entry-text">経営コンサルデモ</div>
+            <div class="demo-entry-sub">病院経営支援AI</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 2: BOOTH INTRO (Avatar narrated slideshow) ===== -->
+  <div class="screen" id="screen-booth-intro">
+    <div class="booth-intro-container">
+      <button class="detail-back" onclick="navigateTo('screen-welcome')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        ホームへ戻る
+      </button>
+
+      <div class="avatar-container booth-intro-avatar">
+        <div class="avatar-ring"></div>
+        <div class="avatar-ring-2"></div>
+        <div class="avatar-body">
+          <div class="avatar-face">
+            <div class="avatar-antenna"></div>
+            <div class="avatar-eyes">
+              <div class="avatar-eye"></div>
+              <div class="avatar-eye"></div>
+            </div>
+            <div class="avatar-mouth speaking" id="intro-mouth"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="speech-bubble" id="booth-speech" style="margin-bottom: 2rem;">
+        <span class="speech-typing" id="booth-speech-text"></span>
+        <span class="speech-cursor"></span>
+      </div>
+
+      <!-- SLIDESHOW -->
+      <div class="slideshow">
+        <div class="slideshow-track" id="slideshow-track">
+          <!-- Slide 1: blanc general -->
+          <div class="slide">
+            <div class="slide-visual bg-blanc" style="border: 1px solid rgba(56,189,248,0.2);">
+              <div class="slide-visual-icon text-blanc">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg>
+              </div>
+            </div>
+            <div class="slide-content">
+              <div class="slide-station-label text-blanc">BLANC STATION</div>
+              <h3 class="slide-title">blanc（ブラン）<br><span style="font-size:0.6em; font-weight:400;">一般病院向け クラウド電子カルテ</span></h3>
+              <p class="slide-desc">クラウドで使える電子カルテです。紙カルテからの移行や、古いシステムの更新をお考えの病院様に多くご導入いただいています。</p>
+              <div class="slide-tags">
+                <span class="slide-tag text-blanc border-blanc">クラウド対応</span>
+                <span class="slide-tag text-blanc border-blanc">紙カルテ移行</span>
+                <span class="slide-tag text-blanc border-blanc">システム更新</span>
+              </div>
+            </div>
+          </div>
+          <!-- Slide 2: blanc psychiatric -->
+          <div class="slide">
+            <div class="slide-visual bg-cloud" style="border: 1px solid rgba(167,139,250,0.2);">
+              <div class="slide-visual-icon text-cloud">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+              </div>
+            </div>
+            <div class="slide-content">
+              <div class="slide-station-label text-cloud">MENTAL CARE STATION</div>
+              <h3 class="slide-title">blanc（精神）<br><span style="font-size:0.6em; font-weight:400;">精神科専用 クラウド電子カルテ</span></h3>
+              <p class="slide-desc">精神科・メンタルクリニック専用のクラウド電子カルテです。精神科特有の記録や加算にも対応しています。</p>
+              <div class="slide-tags">
+                <span class="slide-tag text-cloud border-cloud">精神科特化</span>
+                <span class="slide-tag text-cloud border-cloud">専用記録</span>
+                <span class="slide-tag text-cloud border-cloud">加算対応</span>
+              </div>
+            </div>
+          </div>
+          <!-- Slide 3: Cloud/Security -->
+          <div class="slide">
+            <div class="slide-visual bg-cloud" style="border: 1px solid rgba(167,139,250,0.2);">
+              <div class="slide-visual-icon text-cloud">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/><path d="M12 13v4M10 15l2-2 2 2"/></svg>
+              </div>
+            </div>
+            <div class="slide-content">
+              <div class="slide-station-label text-cloud">CLOUD STATION</div>
+              <h3 class="slide-title">クラウド / セキュリティ<br><span style="font-size:0.6em; font-weight:400;">病院システムのクラウド移行支援</span></h3>
+              <p class="slide-desc">病院のシステム全体をクラウドへ移行するご支援をしています。セキュリティや安定稼働を重視する情報システム担当の方に多くご相談いただいています。</p>
+              <div class="slide-tags">
+                <span class="slide-tag text-cloud border-cloud">クラウド移行</span>
+                <span class="slide-tag text-cloud border-cloud">セキュリティ</span>
+                <span class="slide-tag text-cloud border-cloud">安定稼働</span>
+              </div>
+            </div>
+          </div>
+          <!-- Slide 4: AI -->
+          <div class="slide">
+            <div class="slide-visual bg-ai" style="border: 1px solid rgba(244,114,182,0.2);">
+              <div class="slide-visual-icon text-ai">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+              </div>
+            </div>
+            <div class="slide-content">
+              <div class="slide-station-label text-ai">AI STATION</div>
+              <h3 class="slide-title">AI活用 / 生成AI<br><span style="font-size:0.6em; font-weight:400;">Microsoft Copilot で業務革新</span></h3>
+              <p class="slide-desc">Microsoft Copilotをはじめとした生成AIを、病院の業務でどう活かすか、実際のデモを交えてご紹介しています。</p>
+              <div class="slide-tags">
+                <span class="slide-tag text-ai border-ai">生成AI</span>
+                <span class="slide-tag text-ai border-ai">Copilot</span>
+                <span class="slide-tag text-ai border-ai">デモ体験</span>
+              </div>
+            </div>
+          </div>
+          <!-- Slide 5: Consultation -->
+          <div class="slide">
+            <div class="slide-visual bg-consult" style="border: 1px solid rgba(251,191,36,0.2);">
+              <div class="slide-visual-icon text-consult">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+              </div>
+            </div>
+            <div class="slide-content">
+              <div class="slide-station-label text-consult">CONSULTATION STATION</div>
+              <h3 class="slide-title">個別相談会<br><span style="font-size:0.6em; font-weight:400;">何から始めればいいか、一緒に考えます</span></h3>
+              <p class="slide-desc">「何から始めたらいいか分からない」という方向けの個別相談コーナーです。担当者が丁寧にお話を伺います。</p>
+              <div class="slide-tags">
+                <span class="slide-tag text-consult border-consult">個別対応</span>
+                <span class="slide-tag text-consult border-consult">無料相談</span>
+                <span class="slide-tag text-consult border-consult">初めての方歓迎</span>
+              </div>
+            </div>
+          </div>
+          <!-- Slide 6: Partner - Medical System -->
+          <div class="slide">
+            <div class="slide-visual bg-partner" style="border: 1px solid rgba(52,211,153,0.2);">
+              <div class="slide-visual-icon" style="color: var(--color-success);">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+              </div>
+            </div>
+            <div class="slide-content">
+              <div class="slide-station-label" style="color: var(--color-success);">PARTNER STATION</div>
+              <h3 class="slide-title">メディカルシステム<br><span style="font-size:0.6em; font-weight:400;">臨床検査・輸血検査システム</span></h3>
+              <p class="slide-desc">パートナー企業のメディカルシステム株式会社。臨床検査システム「GINGA Birth」、輸血検査システム「GINGA Bld」などを展示予定です。</p>
+              <div class="slide-tags">
+                <span class="slide-tag border-partner" style="color: var(--color-success);">パートナー</span>
+                <span class="slide-tag border-partner" style="color: var(--color-success);">臨床検査</span>
+                <span class="slide-tag border-partner" style="color: var(--color-success);">輸血検査</span>
+              </div>
+            </div>
+          </div>
+          <!-- Slide 7: Partner - Medical Front -->
+          <div class="slide">
+            <div class="slide-visual bg-partner" style="border: 1px solid rgba(52,211,153,0.2);">
+              <div class="slide-visual-icon" style="color: var(--color-success);">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+              </div>
+            </div>
+            <div class="slide-content">
+              <div class="slide-station-label" style="color: var(--color-success);">PARTNER STATION</div>
+              <h3 class="slide-title">メディカルフロント<br><span style="font-size:0.6em; font-weight:400;">クラウド型DIシステム SmartDiX®</span></h3>
+              <p class="slide-desc">パートナー企業の株式会社メディカルフロント。クラウド型DIシステム「SmartDiX®」など、医療に貢献する製品・サービスを展示予定です。</p>
+              <div class="slide-tags">
+                <span class="slide-tag border-partner" style="color: var(--color-success);">パートナー</span>
+                <span class="slide-tag border-partner" style="color: var(--color-success);">DI システム</span>
+                <span class="slide-tag border-partner" style="color: var(--color-success);">SmartDiX</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slideshow-nav">
+        <button class="slideshow-arrow" onclick="slideMove(-1)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div id="slideshow-dots"></div>
+        <button class="slideshow-arrow" onclick="slideMove(1)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+      </div>
+
+      <div style="margin-top: 2.5rem;">
+        <button class="cta-btn" onclick="navigateTo('screen-scenario')">
+          ご案内を開始する
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 3: SCENARIO SELECT ===== -->
+  <div class="screen" id="screen-scenario">
+    <div style="text-align:center; max-width:800px; margin-bottom: 1rem;">
+      <button class="detail-back" onclick="navigateTo('screen-booth-intro')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        ブース紹介へ戻る
+      </button>
+      <div class="detail-station">JBCC GALAXY RAILWAY</div>
+      <h2 class="detail-title" style="font-size: clamp(1.6rem, 1rem + 2.5vw, 2.8rem);">本日はどのようなことをお探しですか？</h2>
+      <p class="detail-desc" style="font-size: 1rem;">気になるテーマを選んでください。最適な「駅」へご案内いたします。</p>
+    </div>
+
+    <!-- Train Line Visual -->
+    <div class="train-line">
+      <div class="train-track"></div>
+      <div class="train-stations">
+        <div class="train-station" onclick="navigateTo('screen-detail-blanc')">
+          <div class="train-station-dot" style="border-color: var(--color-blanc);"></div>
+          <span class="train-station-name text-blanc">blanc駅</span>
+        </div>
+        <div class="train-station" onclick="navigateTo('screen-detail-blanc-psy')">
+          <div class="train-station-dot" style="border-color: var(--color-cloud);"></div>
+          <span class="train-station-name text-cloud">精神科駅</span>
+        </div>
+        <div class="train-station" onclick="navigateTo('screen-detail-cloud')">
+          <div class="train-station-dot" style="border-color: var(--color-cloud);"></div>
+          <span class="train-station-name text-cloud">クラウド駅</span>
+        </div>
+        <div class="train-station" onclick="navigateTo('screen-detail-ai')">
+          <div class="train-station-dot" style="border-color: var(--color-ai);"></div>
+          <span class="train-station-name text-ai">AI駅</span>
+        </div>
+        <div class="train-station" onclick="navigateTo('screen-detail-consult')">
+          <div class="train-station-dot" style="border-color: var(--color-consult);"></div>
+          <span class="train-station-name text-consult">相談駅</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scenario Cards -->
+    <div class="scenario-grid">
+      <div class="scenario-card fade-in delay-1" style="--card-accent: var(--color-blanc); --card-glow: rgba(56,189,248,0.15);" onclick="navigateTo('screen-detail-blanc')">
+        <div class="scenario-card-icon bg-blanc"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-blanc)" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></div>
+        <div class="scenario-card-station text-blanc">BLANC STATION</div>
+        <h3 class="scenario-card-title">電子カルテのこと</h3>
+        <p class="scenario-card-desc">導入・更新・クラウド移行をお考えの方へ</p>
+        <div class="scenario-card-arrow text-blanc">→</div>
+      </div>
+
+      <div class="scenario-card fade-in delay-2" style="--card-accent: var(--color-cloud); --card-glow: rgba(167,139,250,0.15);" onclick="navigateTo('screen-detail-cloud')">
+        <div class="scenario-card-icon bg-cloud"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-cloud)" stroke-width="1.5"><path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg></div>
+        <div class="scenario-card-station text-cloud">CLOUD STATION</div>
+        <h3 class="scenario-card-title">クラウドやセキュリティ</h3>
+        <p class="scenario-card-desc">システム全体のクラウド移行・セキュリティ強化</p>
+        <div class="scenario-card-arrow text-cloud">→</div>
+      </div>
+
+      <div class="scenario-card fade-in delay-3" style="--card-accent: var(--color-ai); --card-glow: rgba(244,114,182,0.15);" onclick="navigateTo('screen-detail-ai')">
+        <div class="scenario-card-icon bg-ai"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-ai)" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg></div>
+        <div class="scenario-card-station text-ai">AI STATION</div>
+        <h3 class="scenario-card-title">AIを業務に活かすこと</h3>
+        <p class="scenario-card-desc">生成AIの活用・Microsoft Copilotのデモ体験</p>
+        <div class="scenario-card-arrow text-ai">→</div>
+      </div>
+
+      <div class="scenario-card fade-in delay-4" style="--card-accent: var(--color-consult); --card-glow: rgba(251,191,36,0.15);" onclick="navigateTo('screen-detail-consult')">
+        <div class="scenario-card-icon bg-consult"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-consult)" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <div class="scenario-card-station text-consult">CONSULTATION STATION</div>
+        <h3 class="scenario-card-title">まだ何を見ればいいか分からない</h3>
+        <p class="scenario-card-desc">担当者が丁寧にお話を伺います</p>
+        <div class="scenario-card-arrow text-consult">→</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DETAIL: blanc (General) ===== -->
+  <div class="screen" id="screen-detail-blanc">
+    <div class="detail-header">
+      <button class="detail-back" onclick="navigateTo('screen-scenario')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        案内に戻る
+      </button>
+      <div class="detail-icon bg-blanc" style="border: 1px solid rgba(56,189,248,0.2);">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-blanc)" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg>
+      </div>
+      <div class="detail-station text-blanc">BLANC STATION — 一般病院向け</div>
+      <h2 class="detail-title">blanc（ブラン）</h2>
+      <p class="detail-desc">クラウドで使える電子カルテです。紙カルテからの移行や、古いシステムの更新をお考えの病院様に多くご導入いただいています。</p>
+    </div>
+    <div class="detail-features">
+      <div class="detail-feature fade-in delay-1">
+        <h4 class="detail-feature-title text-blanc">クラウド対応</h4>
+        <p class="detail-feature-desc">サーバー管理不要。いつでもどこでもアクセス可能な電子カルテ環境を実現します。</p>
+      </div>
+      <div class="detail-feature fade-in delay-2">
+        <h4 class="detail-feature-title text-blanc">スムーズな移行</h4>
+        <p class="detail-feature-desc">紙カルテからの移行もサポート。段階的な導入で現場の負担を最小限に抑えます。</p>
+      </div>
+      <div class="detail-feature fade-in delay-3">
+        <h4 class="detail-feature-title text-blanc">豊富な導入実績</h4>
+        <p class="detail-feature-desc">多くの病院様にご導入いただいた実績とノウハウがあります。</p>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top: 1rem;">
+      <a href="#blanc-service" class="detail-cta" style="background: linear-gradient(135deg, var(--color-blanc), #0ea5e9);">
+        blanc担当者をご案内します
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <button class="detail-cta detail-cta-secondary" onclick="navigateTo('screen-detail-blanc-psy')">精神科向けはこちら</button>
+    </div>
+  </div>
+
+  <!-- ===== DETAIL: blanc (Psychiatric) ===== -->
+  <div class="screen" id="screen-detail-blanc-psy">
+    <div class="detail-header">
+      <button class="detail-back" onclick="navigateTo('screen-scenario')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        案内に戻る
+      </button>
+      <div class="detail-icon bg-cloud" style="border: 1px solid rgba(167,139,250,0.2);">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-cloud)" stroke-width="1.5"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+      </div>
+      <div class="detail-station text-cloud">MENTAL CARE STATION — 精神科特化</div>
+      <h2 class="detail-title">blanc（精神）</h2>
+      <p class="detail-desc">精神科・メンタルクリニック専用のクラウド電子カルテです。精神科特有の記録や加算にも対応しています。</p>
+    </div>
+    <div class="detail-features">
+      <div class="detail-feature fade-in delay-1">
+        <h4 class="detail-feature-title text-cloud">精神科特化</h4>
+        <p class="detail-feature-desc">精神科特有の記録形式、加算、処方管理に完全対応した電子カルテです。</p>
+      </div>
+      <div class="detail-feature fade-in delay-2">
+        <h4 class="detail-feature-title text-cloud">クラウド運用</h4>
+        <p class="detail-feature-desc">クラウドベースでいつでもどこでも安全にアクセス。BCP対策にも有効です。</p>
+      </div>
+      <div class="detail-feature fade-in delay-3">
+        <h4 class="detail-feature-title text-cloud">専門サポート</h4>
+        <p class="detail-feature-desc">精神科医療に精通したサポートチームが導入から運用まで伴走します。</p>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top: 1rem;">
+      <a href="#blanc-psy-service" class="detail-cta" style="background: linear-gradient(135deg, var(--color-cloud), #7c3aed);">
+        blanc精神担当者をご案内します
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <button class="detail-cta detail-cta-secondary" onclick="navigateTo('screen-detail-blanc')">一般病院向けはこちら</button>
+    </div>
+  </div>
+
+  <!-- ===== DETAIL: Cloud/Security ===== -->
+  <div class="screen" id="screen-detail-cloud">
+    <div class="detail-header">
+      <button class="detail-back" onclick="navigateTo('screen-scenario')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        案内に戻る
+      </button>
+      <div class="detail-icon bg-cloud" style="border: 1px solid rgba(167,139,250,0.2);">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-cloud)" stroke-width="1.5"><path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>
+      </div>
+      <div class="detail-station text-cloud">CLOUD STATION</div>
+      <h2 class="detail-title">クラウド / セキュリティ</h2>
+      <p class="detail-desc">病院のシステム全体をクラウドへ移行するご支援をしています。セキュリティや安定稼働を重視する情報システム担当の方に多くご相談いただいています。</p>
+    </div>
+    <div class="detail-features">
+      <div class="detail-feature fade-in delay-1">
+        <h4 class="detail-feature-title text-cloud">クラウド移行支援</h4>
+        <p class="detail-feature-desc">病院システム全体のクラウド移行を計画から実行まで一貫してサポートします。</p>
+      </div>
+      <div class="detail-feature fade-in delay-2">
+        <h4 class="detail-feature-title text-cloud">セキュリティ強化</h4>
+        <p class="detail-feature-desc">医療情報ガイドラインに準拠したセキュリティ対策を実現します。</p>
+      </div>
+      <div class="detail-feature fade-in delay-3">
+        <h4 class="detail-feature-title text-cloud">安定稼働</h4>
+        <p class="detail-feature-desc">24時間365日の監視体制で、病院システムの安定稼働を支えます。</p>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top: 1rem;">
+      <a href="#cloud-service" class="detail-cta" style="background: linear-gradient(135deg, var(--color-cloud), #7c3aed);">
+        クラウド/セキュリティ担当者をご案内します
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- ===== DETAIL: AI ===== -->
+  <div class="screen" id="screen-detail-ai">
+    <div class="detail-header">
+      <button class="detail-back" onclick="navigateTo('screen-scenario')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        案内に戻る
+      </button>
+      <div class="detail-icon bg-ai" style="border: 1px solid rgba(244,114,182,0.2);">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-ai)" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+      </div>
+      <div class="detail-station text-ai">AI STATION</div>
+      <h2 class="detail-title">AI活用 / 生成AI</h2>
+      <p class="detail-desc">Microsoft Copilotをはじめとした生成AIを、病院の業務でどう活かすか、実際のデモを交えてご紹介しています。</p>
+    </div>
+    <div class="detail-features">
+      <div class="detail-feature fade-in delay-1">
+        <h4 class="detail-feature-title text-ai">生成AI体験</h4>
+        <p class="detail-feature-desc">実際のデモを通じて、生成AIが病院業務をどう変えるか体感いただけます。</p>
+      </div>
+      <div class="detail-feature fade-in delay-2">
+        <h4 class="detail-feature-title text-ai">Microsoft Copilot</h4>
+        <p class="detail-feature-desc">Microsoft Copilotを活用した業務効率化の具体的な事例をご紹介します。</p>
+      </div>
+      <div class="detail-feature fade-in delay-3">
+        <h4 class="detail-feature-title text-ai">導入相談</h4>
+        <p class="detail-feature-desc">具体的な活用方法や費用感まで、担当者が詳しくご説明します。</p>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top: 1rem;">
+      <a href="#ai-service" class="detail-cta" style="background: linear-gradient(135deg, var(--color-ai), #db2777);">
+        AI活用担当者をご案内します
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <button class="detail-cta detail-cta-secondary" onclick="navigateTo('screen-detail-consult')">個別相談もご希望の方はこちら</button>
+    </div>
+  </div>
+
+  <!-- ===== DETAIL: Consultation ===== -->
+  <div class="screen" id="screen-detail-consult">
+    <div class="detail-header">
+      <button class="detail-back" onclick="navigateTo('screen-scenario')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        案内に戻る
+      </button>
+      <div class="detail-icon bg-consult" style="border: 1px solid rgba(251,191,36,0.2);">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-consult)" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      </div>
+      <div class="detail-station text-consult">CONSULTATION STATION</div>
+      <h2 class="detail-title">個別相談会</h2>
+      <p class="detail-desc">「何から始めたらいいか分からない」という方向けの個別相談コーナーです。担当者が丁寧にお話を伺い、最適な方向性を一緒に考えます。</p>
+    </div>
+    <div class="detail-features">
+      <div class="detail-feature fade-in delay-1">
+        <h4 class="detail-feature-title text-consult">お気軽にどうぞ</h4>
+        <p class="detail-feature-desc">具体的な検討段階でなくても大丈夫。まずはお話しいただくだけでOKです。</p>
+      </div>
+      <div class="detail-feature fade-in delay-2">
+        <h4 class="detail-feature-title text-consult">丁寧なヒアリング</h4>
+        <p class="detail-feature-desc">病院様の状況をお聞きした上で、最適なご提案をさせていただきます。</p>
+      </div>
+      <div class="detail-feature fade-in delay-3">
+        <h4 class="detail-feature-title text-consult">全体最適の視点</h4>
+        <p class="detail-feature-desc">電子カルテ・クラウド・AIなど、全体を見渡した最適なプランをご提案します。</p>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top: 1rem;">
+      <a href="#consult-service" class="detail-cta" style="background: linear-gradient(135deg, var(--color-consult), #f59e0b);">
+        相談会担当者をご案内します
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- ===== DEMO: Hospital Reception ===== -->
+  <div class="screen" id="screen-demo-reception">
+    <div class="demo-screen">
+      <button class="detail-back" onclick="navigateTo('screen-welcome')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        ホームへ戻る
+      </button>
+      <div class="demo-header">
+        <div class="demo-header-badge" style="background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.25); color: var(--color-blanc);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M9 8h1M9 12h1M9 16h1M14 8h1M14 12h1M14 16h1M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16"/></svg>
+          RECEPTION DEMO
+        </div>
+        <h2 class="demo-title">銀河鉄道病院<span class="text-blanc"> 受付案内</span></h2>
+        <p class="demo-subtitle">AIアバターが受付で患者様をご案内するデモンストレーションです</p>
+      </div>
+      <div class="demo-chat-area" id="reception-chat"></div>
+      <div class="demo-nav">
+        <button class="demo-reset-btn" onclick="startReceptionDemo()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg>
+          最初からやり直す
+        </button>
+        <button class="demo-reset-btn" onclick="navigateTo('screen-demo-consulting')">
+          経営コンサルデモへ →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DEMO: Hospital Consulting ===== -->
+  <div class="screen" id="screen-demo-consulting">
+    <div class="demo-screen">
+      <button class="detail-back" onclick="navigateTo('screen-welcome')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        ホームへ戻る
+      </button>
+      <div class="demo-header">
+        <div class="demo-header-badge" style="background: rgba(244,114,182,0.12); border: 1px solid rgba(244,114,182,0.25); color: var(--color-ai);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+          CONSULTING DEMO
+        </div>
+        <h2 class="demo-title">病院経営<span class="text-ai">コンサルティング</span>AI</h2>
+        <p class="demo-subtitle">地域特性・病床数・人口動態をヒアリングし、最適な病院経営の方向性をご提案します</p>
+      </div>
+      <div class="demo-chat-area" id="consulting-chat"></div>
+      <div class="demo-nav">
+        <button class="demo-reset-btn" onclick="startConsultingDemo()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg>
+          最初からやり直す
+        </button>
+        <button class="demo-reset-btn" onclick="navigateTo('screen-demo-reception')">
+          ← 受付案内デモへ
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- .app -->
+
+<!-- Staff Avatar Panel (shown on non-welcome screens) -->
+<div class="staff-panel" id="staff-panel">
+  <!-- Speech Bubble -->
+  <div class="staff-speech" id="staff-speech">
+    <img class="staff-speech-photo" id="staff-speech-photo" src="" alt="">
+    <div class="staff-speech-body">
+      <div class="staff-speech-name" id="staff-speech-name"></div>
+      <div class="staff-speech-text" id="staff-speech-text"></div>
+    </div>
+    <button class="staff-speech-close" onclick="hideStaffSpeech()">&times;</button>
+  </div>
+  <!-- Card -->
+  <div class="staff-card" id="staff-card" onclick="toggleStaffSpeech()">
+    <div class="staff-photo-wrap">
+      <div class="staff-photo-ring"></div>
+      <div class="staff-photo-placeholder">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <img class="staff-photo" id="staff-photo" src="" alt="" onload="this.classList.add('loaded')" onerror="this.classList.remove('loaded')">
+    </div>
+    <div class="staff-info">
+      <div class="staff-name" id="staff-name">案内スタッフ</div>
+      <div class="staff-role" id="staff-role">JBCC Healthcare</div>
+      <div class="staff-indicator" id="staff-indicator"></div>
+    </div>
+    <div class="staff-robot">
+      <div class="avatar-ring"></div>
+      <div class="avatar-ring-2"></div>
+      <div class="avatar-body">
+        <div class="avatar-face">
+          <div class="avatar-antenna"></div>
+          <div class="avatar-eyes">
+            <div class="avatar-eye"></div>
+            <div class="avatar-eye"></div>
+          </div>
+          <div class="avatar-mouth" id="float-mouth"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Legacy floating avatar (hidden, kept for compatibility) -->
+<div class="avatar-sm" id="floating-avatar" style="display:none;"></div>
+<div class="avatar-speech-float" id="avatar-speech-float" style="display:none;">
+  <span id="avatar-speech-float-text"></span>
+</div>
+
+<script>
+const SCREENS = {};
+let currentScreen = 'screen-welcome';
+let currentSlide = 0;
+let slideCount = 7;
+let slideAutoTimer = null;
+let typingTimer = null;
+let staffCycleTimer = null;
+let currentStaffIdx = 0;
+
+const AVATAR_PLACEHOLDER_1 = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><defs><linearGradient id="bg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1e293b"/><stop offset="100%" stop-color="#334155"/></linearGradient><linearGradient id="skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f5d0b0"/><stop offset="100%" stop-color="#e8b896"/></linearGradient></defs><rect width="200" height="200" fill="url(#bg1)"/><ellipse cx="100" cy="240" rx="80" ry="90" fill="#1e3a5f"/><circle cx="100" cy="90" r="45" fill="url(#skin)"/><path d="M55 75 C55 45 145 45 145 75 L140 60 C140 40 60 40 60 60Z" fill="#1a1a2e"/><circle cx="85" cy="88" r="3" fill="#2d2d3d"/><circle cx="115" cy="88" r="3" fill="#2d2d3d"/><path d="M90 102 Q100 108 110 102" stroke="#c4886e" stroke-width="2" fill="none"/><rect x="70" y="140" width="60" height="60" rx="4" fill="#1e3a5f"/><line x1="100" y1="140" x2="100" y2="200" stroke="#2a4a6f" stroke-width="1"/></svg>');
+const AVATAR_PLACEHOLDER_2 = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><defs><linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1e293b"/><stop offset="100%" stop-color="#374151"/></linearGradient><linearGradient id="skin2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f5d0b0"/><stop offset="100%" stop-color="#e8b896"/></linearGradient></defs><rect width="200" height="200" fill="url(#bg2)"/><ellipse cx="100" cy="240" rx="80" ry="90" fill="#f0f0f0"/><circle cx="100" cy="90" r="45" fill="url(#skin2)"/><path d="M55 80 C55 42 145 42 145 80 L142 65 Q140 48 120 50 L100 55 L80 50 Q60 48 58 65Z" fill="#1a1a2e"/><circle cx="85" cy="88" r="3" fill="#2d2d3d"/><circle cx="115" cy="88" r="3" fill="#2d2d3d"/><path d="M90 102 Q100 108 110 102" stroke="#c4886e" stroke-width="2" fill="none"/><rect x="70" y="140" width="60" height="60" rx="4" fill="#f0f0f0"/><path d="M85 140 L85 155 Q85 165 100 165 Q115 165 115 155 L115 140" fill="#3b82f6" opacity="0.6"/></svg>');
+const AVATAR_PLACEHOLDER_3 = "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><defs><linearGradient id="bg3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1e293b"/><stop offset="100%" stop-color="#334155"/></linearGradient><linearGradient id="skin3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f5d0b0"/><stop offset="100%" stop-color="#e8b896"/></linearGradient></defs><rect width="200" height="200" fill="url(#bg3)"/><ellipse cx="100" cy="240" rx="80" ry="90" fill="#d4c5a9"/><circle cx="100" cy="90" r="45" fill="url(#skin3)"/><path d="M58 78 C58 44 142 44 142 78 L138 62 Q130 50 100 52 Q70 50 62 62Z" fill="#3d2b1f"/><circle cx="85" cy="88" r="3" fill="#2d2d3d"/><circle cx="115" cy="88" r="3" fill="#2d2d3d"/><path d="M90 102 Q100 108 110 102" stroke="#c4886e" stroke-width="2" fill="none"/><rect x="70" y="140" width="60" height="60" rx="4" fill="#d4c5a9"/></svg>');
+
+const STAFF_AVATARS = [
+  { name: '統合アバター', role: 'JBCC Healthcare Guide', photo: 'avatars/avatar1.jpg', placeholder: AVATAR_PLACEHOLDER_1 },
+  { name: '案内スタッフ', role: 'JBCC Healthcare Guide', photo: 'avatars/avatar2.jpg', placeholder: AVATAR_PLACEHOLDER_2 },
+  { name: '案内スタッフ', role: 'JBCC Healthcare Guide', photo: 'avatars/avatar3.jpg', placeholder: AVATAR_PLACEHOLDER_3 },
+];
+
+const STAFF_GREETINGS = [
+  '私たちがご説明いたします。お気軽にお声がけください！',
+  'JBCCブースへようこそ！各コーナーをご案内させていただきます。',
+  'ご質問がございましたら、いつでもお申し付けください。',
+];
+
+const AVATAR_MESSAGES = {
+  'screen-scenario': 'いくつかご案内できるコーナーがあります。今日一番気になっていることを教えてください！',
+  'screen-detail-blanc': 'クラウドで使える電子カルテ「blanc」をご紹介しているコーナーです。紙カルテからの移行や、システム更新をお考えの方にぴったりです。',
+  'screen-detail-blanc-psy': '精神科・メンタル系に特化したクラウド電子カルテ「blanc（精神）」のコーナーです。精神科特有の記録や加算にも対応しています。',
+  'screen-detail-cloud': '病院のシステム全体のクラウド移行やセキュリティをご支援しているコーナーです。情報システム担当の方に多くご相談いただいています。',
+  'screen-detail-ai': '生成AIを病院業務でどう活かすか、Microsoft Copilotを使った実例もご紹介しています。実際のデモもご覧いただけます！',
+  'screen-detail-consult': '個別にご相談できるコーナーです。何から始めたらいいか分からないという方も、担当者が一緒に整理させていただきます。',
+};
+
+const BOOTH_SPEECHES = [
+  'JBCCブースへようこそ！私がご案内いたします。まずは各コーナーをご紹介しますね。',
+  'こちらは「blanc（ブラン）」。クラウドで使える電子カルテです。紙カルテからの移行をお考えの病院様に多くご導入いただいています。',
+  '精神科・メンタル系に特化した「blanc（精神）」もございます。精神科特有の記録や加算にも対応しています。',
+  'クラウド/セキュリティのコーナーでは、病院のシステム全体のクラウド移行をご支援しています。',
+  'AI活用コーナーでは、Microsoft Copilotをはじめとした生成AIの活用事例を、デモを交えてご紹介しています。',
+  '何から始めたらいいか分からない方は、個別相談コーナーへどうぞ。担当者が丁寧にお話を伺います。',
+  'パートナーのメディカルシステム株式会社は、臨床検査システムや輸血検査システムを展示予定です。',
+  'パートナーの株式会社メディカルフロントは、クラウド型DIシステム「SmartDiX®」などを展示予定です。',
+];
+
+function initStarfield() {
+  const container = document.getElementById('starfield');
+  const count = 200;
+  for (let i = 0; i < count; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    const size = Math.random() * 2 + 0.5;
+    star.style.cssText = `
+      width: ${size}px; height: ${size}px;
+      top: ${Math.random() * 100}%; left: ${Math.random() * 100}%;
+      --dur: ${2 + Math.random() * 4}s;
+      --o1: ${0.2 + Math.random() * 0.3};
+      --o2: ${0.6 + Math.random() * 0.4};
+      animation-delay: ${Math.random() * 4}s;
+    `;
+    container.appendChild(star);
+  }
+}
+
+function shootingStar() {
+  const star = document.createElement('div');
+  star.className = 'shooting-star';
+  const y = Math.random() * 60;
+  const x = Math.random() * 60;
+  const angle = -15 + Math.random() * 10;
+  star.style.cssText = `
+    top: ${y}%; left: ${x}%;
+    transform: rotate(${angle}deg);
+    width: ${60 + Math.random() * 100}px;
+  `;
+  document.body.appendChild(star);
+  star.animate([
+    { opacity: 0, transform: `rotate(${angle}deg) translateX(0)` },
+    { opacity: 1, transform: `rotate(${angle}deg) translateX(200px)`, offset: 0.3 },
+    { opacity: 0, transform: `rotate(${angle}deg) translateX(600px)` }
+  ], { duration: 1200, easing: 'ease-out' }).onfinish = () => star.remove();
+}
+
+function typeText(element, text, speed = 40, callback) {
+  if (typingTimer) clearTimeout(typingTimer);
+  element.textContent = '';
+  let i = 0;
+  function type() {
+    if (i < text.length) {
+      element.textContent += text.charAt(i);
+      i++;
+      typingTimer = setTimeout(type, speed);
+    } else if (callback) {
+      callback();
+    }
+  }
+  type();
+}
+
+function navigateTo(screenId) {
+  const prev = document.getElementById(currentScreen);
+  if (prev) prev.classList.remove('active');
+  currentScreen = screenId;
+  const next = document.getElementById(screenId);
+  if (next) {
+    next.classList.remove('active');
+    void next.offsetWidth;
+    next.classList.add('active');
+  }
+
+  const hidePanel = screenId === 'screen-welcome' || screenId === 'screen-booth-intro'
+    || screenId === 'screen-demo-reception' || screenId === 'screen-demo-consulting';
+  const panel = document.getElementById('staff-panel');
+  if (hidePanel) {
+    panel.classList.remove('visible');
+    hideStaffSpeech();
+    stopStaffCycle();
+  } else {
+    panel.classList.add('visible');
+    updateStaffDisplay(currentStaffIdx);
+    startStaffCycle();
+    setTimeout(() => showStaffMessage(screenId), 800);
+  }
+
+  if (screenId === 'screen-welcome') {
+    startWelcomeTyping();
+  }
+
+  if (screenId === 'screen-booth-intro') {
+    currentSlide = 0;
+    updateSlideshow();
+    startBoothIntro();
+    startSlideAutoPlay();
+  } else {
+    stopSlideAutoPlay();
+  }
+
+  if (screenId === 'screen-demo-reception') {
+    startReceptionDemo();
+  }
+  if (screenId === 'screen-demo-consulting') {
+    startConsultingDemo();
+  }
+
+  window.scrollTo(0, 0);
+}
+
+function startWelcomeTyping() {
+  const el = document.getElementById('welcome-text');
+  const mouth = document.getElementById('main-mouth');
+  mouth.classList.add('speaking');
+  typeText(el, 'こんにちは！JBCCブースへようこそ。私はこのブースの案内AIです。銀河鉄道に乗って、ヘルスケアの未来を一緒に探しに行きましょう！', 50, () => {
+    mouth.classList.remove('speaking');
+  });
+}
+
+function startBoothIntro() {
+  const el = document.getElementById('booth-speech-text');
+  const mouth = document.getElementById('intro-mouth');
+  let idx = 0;
+  function nextSpeech() {
+    if (idx >= BOOTH_SPEECHES.length) {
+      idx = 0;
+    }
+    mouth.classList.add('speaking');
+    typeText(el, BOOTH_SPEECHES[idx], 45, () => {
+      mouth.classList.remove('speaking');
+      idx++;
+      setTimeout(nextSpeech, 3000);
+    });
+  }
+  nextSpeech();
+}
+
+function updateSlideshow() {
+  const track = document.getElementById('slideshow-track');
+  track.style.transform = `translateX(-${currentSlide * 100}%)`;
+  const dots = document.getElementById('slideshow-dots');
+  dots.innerHTML = '';
+  for (let i = 0; i < slideCount; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'slideshow-dot' + (i === currentSlide ? ' active' : '');
+    dot.onclick = () => { currentSlide = i; updateSlideshow(); };
+    dots.appendChild(dot);
+  }
+}
+
+function slideMove(dir) {
+  currentSlide = (currentSlide + dir + slideCount) % slideCount;
+  updateSlideshow();
+  restartSlideAutoPlay();
+}
+
+function startSlideAutoPlay() {
+  stopSlideAutoPlay();
+  slideAutoTimer = setInterval(() => {
+    currentSlide = (currentSlide + 1) % slideCount;
+    updateSlideshow();
+  }, 6000);
+}
+
+function stopSlideAutoPlay() {
+  if (slideAutoTimer) {
+    clearInterval(slideAutoTimer);
+    slideAutoTimer = null;
+  }
+}
+
+function restartSlideAutoPlay() {
+  stopSlideAutoPlay();
+  startSlideAutoPlay();
+}
+
+function getStaffSrc(staff) {
+  const img = new Image();
+  img.src = staff.photo;
+  return staff.photo;
+}
+
+function updateStaffDisplay(idx) {
+  const staff = STAFF_AVATARS[idx];
+  if (!staff) return;
+  const photo = document.getElementById('staff-photo');
+  const name = document.getElementById('staff-name');
+  const role = document.getElementById('staff-role');
+  const testImg = new Image();
+  testImg.onload = () => { photo.src = staff.photo; };
+  testImg.onerror = () => { photo.src = staff.placeholder; photo.classList.add('loaded'); };
+  testImg.src = staff.photo;
+  name.textContent = staff.name;
+  role.textContent = staff.role;
+  const indicator = document.getElementById('staff-indicator');
+  indicator.innerHTML = '';
+  for (let i = 0; i < STAFF_AVATARS.length; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'staff-dot' + (i === idx ? ' active' : '');
+    indicator.appendChild(dot);
+  }
+}
+
+function startStaffCycle() {
+  stopStaffCycle();
+  staffCycleTimer = setInterval(() => {
+    currentStaffIdx = (currentStaffIdx + 1) % STAFF_AVATARS.length;
+    updateStaffDisplay(currentStaffIdx);
+  }, 5000);
+}
+
+function stopStaffCycle() {
+  if (staffCycleTimer) {
+    clearInterval(staffCycleTimer);
+    staffCycleTimer = null;
+  }
+}
+
+function setStaffPhoto(imgEl, staff) {
+  const test = new Image();
+  test.onload = () => { imgEl.src = staff.photo; };
+  test.onerror = () => { imgEl.src = staff.placeholder; };
+  test.src = staff.photo;
+}
+
+function showStaffMessage(screenId) {
+  const msg = AVATAR_MESSAGES[screenId];
+  if (!msg) return;
+  const staff = STAFF_AVATARS[currentStaffIdx];
+  const bubble = document.getElementById('staff-speech');
+  const textEl = document.getElementById('staff-speech-text');
+  const nameEl = document.getElementById('staff-speech-name');
+  const photoEl = document.getElementById('staff-speech-photo');
+  nameEl.textContent = staff.name;
+  setStaffPhoto(photoEl, staff);
+  textEl.textContent = '';
+  bubble.classList.add('visible');
+  const mouth = document.getElementById('float-mouth');
+  mouth.classList.add('speaking');
+  typeText(textEl, msg, 35, () => {
+    mouth.classList.remove('speaking');
+    setTimeout(() => { bubble.classList.remove('visible'); }, 8000);
+  });
+}
+
+function toggleStaffSpeech() {
+  const bubble = document.getElementById('staff-speech');
+  if (bubble.classList.contains('visible')) {
+    bubble.classList.remove('visible');
+  } else {
+    const staff = STAFF_AVATARS[currentStaffIdx];
+    const greeting = STAFF_GREETINGS[currentStaffIdx % STAFF_GREETINGS.length];
+    const msg = AVATAR_MESSAGES[currentScreen] || greeting;
+    const textEl = document.getElementById('staff-speech-text');
+    const nameEl = document.getElementById('staff-speech-name');
+    const photoEl = document.getElementById('staff-speech-photo');
+    nameEl.textContent = staff.name;
+    setStaffPhoto(photoEl, staff);
+    textEl.textContent = '';
+    bubble.classList.add('visible');
+    const mouth = document.getElementById('float-mouth');
+    mouth.classList.add('speaking');
+    typeText(textEl, msg, 35, () => {
+      mouth.classList.remove('speaking');
+      setTimeout(() => { bubble.classList.remove('visible'); }, 8000);
+    });
+  }
+}
+
+function hideStaffSpeech() {
+  document.getElementById('staff-speech').classList.remove('visible');
+}
+
+/* ===== RECEPTION DEMO ===== */
+const NURSE_AVATAR = 'avatars/nurse.png';
+const CONSULTANT_AVATAR = 'avatars/consultant.png';
+const USER_ICON_SVG = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+
+function addChatMsg(container, type, text, avatarSrc, options) {
+  const chatArea = document.getElementById(container);
+  const msg = document.createElement('div');
+  msg.className = 'chat-msg ' + type;
+  let avatarHtml;
+  if (type === 'ai') {
+    avatarHtml = '<img class="chat-avatar" src="' + avatarSrc + '" alt="">';
+  } else {
+    avatarHtml = '<div class="chat-avatar user-icon">' + USER_ICON_SVG + '</div>';
+  }
+  let optionsHtml = '';
+  if (options && options.length > 0) {
+    optionsHtml = '<div class="chat-options" id="opts-' + Date.now() + '">';
+    options.forEach((opt, i) => {
+      optionsHtml += '<button class="chat-option-btn" data-action="' + (opt.action || '') + '" onclick="handleDemoOption(this, \'' + container + '\')">' + opt.label + '</button>';
+    });
+    optionsHtml += '</div>';
+  }
+  msg.innerHTML = avatarHtml + '<div class="chat-bubble">' + text + optionsHtml + '</div>';
+  chatArea.appendChild(msg);
+  chatArea.scrollTop = chatArea.scrollHeight;
+  return msg;
+}
+
+function showTyping(container, avatarSrc) {
+  const chatArea = document.getElementById(container);
+  const msg = document.createElement('div');
+  msg.className = 'chat-msg ai';
+  msg.id = 'typing-' + container;
+  msg.innerHTML = '<img class="chat-avatar" src="' + avatarSrc + '" alt="">'
+    + '<div class="chat-typing-indicator"><div class="chat-typing-dot"></div><div class="chat-typing-dot"></div><div class="chat-typing-dot"></div></div>';
+  chatArea.appendChild(msg);
+  chatArea.scrollTop = chatArea.scrollHeight;
+}
+
+function hideTyping(container) {
+  const el = document.getElementById('typing-' + container);
+  if (el) el.remove();
+}
+
+function disableOptions(container) {
+  const chatArea = document.getElementById(container);
+  chatArea.querySelectorAll('.chat-option-btn:not(:disabled)').forEach(btn => {
+    btn.disabled = true;
+  });
+}
+
+let receptionStep = 0;
+function startReceptionDemo() {
+  receptionStep = 0;
+  const chat = document.getElementById('reception-chat');
+  chat.innerHTML = '';
+  setTimeout(() => {
+    showTyping('reception-chat', NURSE_AVATAR);
+    setTimeout(() => {
+      hideTyping('reception-chat');
+      addChatMsg('reception-chat', 'ai',
+        'こんにちは。銀河鉄道病院へようこそ。<br>受付担当の星野と申します。<br><br>本日はどのようなご用件でいらっしゃいますか？',
+        NURSE_AVATAR,
+        [
+          { label: '診察を受けたい' },
+          { label: '検査の予約' },
+          { label: '処方箋をもらいたい' },
+          { label: '入院の相談' },
+        ]
+      );
+      receptionStep = 1;
+    }, 1200);
+  }, 600);
+}
+
+const RECEPTION_FLOWS = {
+  '診察を受けたい': {
+    q: '承知しました。診察ですね。<br>どのような症状がございますか？',
+    opts: [
+      { label: '頭痛・発熱' },
+      { label: '腹痛・胃の不調' },
+      { label: '腰痛・関節の痛み' },
+      { label: 'その他の症状' },
+    ],
+    next: {
+      '頭痛・発熱': {
+        q: '頭痛・発熱でいらっしゃいますね。<br>いつ頃から症状がありますか？',
+        opts: [{ label: '今日から' }, { label: '2〜3日前から' }, { label: '1週間以上前から' }],
+        final: '承知しました。<strong>内科</strong>の診察をご案内いたします。<br><br>本日の内科担当は<strong>天の川先生</strong>です。<br>2階の「北斗診察室」へお進みください。<br><br>受付番号は <strong style="color: var(--color-primary); font-size: 1.3em;">A-037</strong> です。<br>お呼びするまで待合室でお待ちください。'
+      },
+      '腹痛・胃の不調': {
+        q: '腹痛でいらっしゃいますね。<br>痛みの場所はどのあたりですか？',
+        opts: [{ label: '上腹部（みぞおち）' }, { label: '下腹部' }, { label: '全体的に痛い' }],
+        final: '承知しました。<strong>消化器内科</strong>をご案内いたします。<br><br>本日の担当は<strong>彦星先生</strong>です。<br>3階の「織姫診察室」へお進みください。<br><br>受付番号は <strong style="color: var(--color-primary); font-size: 1.3em;">B-012</strong> です。'
+      },
+      '腰痛・関節の痛み': {
+        q: '腰痛・関節の痛みですね。<br>痛みが出たきっかけはありますか？',
+        opts: [{ label: 'スポーツや運動中' }, { label: '朝起きたら痛かった' }, { label: '特にきっかけはない' }],
+        final: '承知しました。<strong>整形外科</strong>をご案内いたします。<br><br>本日の担当は<strong>カシオペア先生</strong>です。<br>2階の「銀河診察室」へお進みください。<br><br>受付番号は <strong style="color: var(--color-primary); font-size: 1.3em;">C-005</strong> です。'
+      },
+      'その他の症状': {
+        q: 'その他の症状ですね。<br>もう少し詳しく教えていただけますか？',
+        opts: [{ label: '皮膚の症状' }, { label: '目や耳の症状' }, { label: '心の不調' }],
+        final: '承知しました。最適な診療科をご案内いたします。<br><br>まず<strong>総合受付</strong>で問診票をご記入ください。<br>1階「プラネタリウムホール」の総合受付カウンターへお進みください。<br><br>受付番号は <strong style="color: var(--color-primary); font-size: 1.3em;">D-021</strong> です。'
+      },
+    }
+  },
+  '検査の予約': {
+    q: '検査のご予約ですね。<br>どのような検査をご希望ですか？',
+    opts: [
+      { label: '血液検査' },
+      { label: 'CT・MRI' },
+      { label: '健康診断' },
+    ],
+    final: '承知しました。検査のご予約を承ります。<br><br>検査受付は地下1階「オリオン検査センター」です。<br>紹介状や保険証をお持ちの方は、そのままお進みください。<br><br>次の空き枠は<strong style="color: var(--color-primary);">5月20日（火）10:00〜</strong>です。<br>ご都合はいかがでしょうか？'
+  },
+  '処方箋をもらいたい': {
+    q: '処方箋のご希望ですね。<br>以前当院で診察を受けられたことはありますか？',
+    opts: [
+      { label: 'はい、定期的に通院' },
+      { label: 'はい、以前一度だけ' },
+      { label: 'いいえ、初めてです' },
+    ],
+    final: '承知しました。<br><br>定期処方の場合は、1階「流星薬局カウンター」で直接お受けいただけます。<br>診察券と保険証をお持ちください。<br><br>初診の方は、先に<strong>総合受付</strong>で受診手続きが必要です。<br>受付番号は <strong style="color: var(--color-primary); font-size: 1.3em;">E-008</strong> です。'
+  },
+  '入院の相談': {
+    q: '入院のご相談ですね。<br>どのような状況でしょうか？',
+    opts: [
+      { label: '医師から入院を勧められた' },
+      { label: '家族の入院について相談' },
+      { label: '入院費用について知りたい' },
+    ],
+    final: '承知しました。入院のご相談ですね。<br><br><strong>入院相談窓口</strong>は1階「すばる相談室」にございます。<br>医療ソーシャルワーカーが丁寧にご説明いたします。<br><br>本日は<strong>14:00まで</strong>受付可能です。<br>お待たせしないよう整理券をお渡しいたします。'
+  },
+};
+
+let receptionState = {};
+function handleReceptionOption(label) {
+  disableOptions('reception-chat');
+  addChatMsg('reception-chat', 'user', label, null);
+
+  if (receptionStep === 1) {
+    const flow = RECEPTION_FLOWS[label];
+    if (!flow) return;
+    receptionState = { flow, label };
+    setTimeout(() => {
+      showTyping('reception-chat', NURSE_AVATAR);
+      setTimeout(() => {
+        hideTyping('reception-chat');
+        if (flow.final && !flow.next) {
+          addChatMsg('reception-chat', 'ai', flow.q, NURSE_AVATAR, flow.opts);
+          receptionStep = 3;
+        } else {
+          addChatMsg('reception-chat', 'ai', flow.q, NURSE_AVATAR, flow.opts);
+          receptionStep = 2;
+        }
+      }, 1000);
+    }, 500);
+  } else if (receptionStep === 2) {
+    const subFlow = receptionState.flow.next && receptionState.flow.next[label];
+    setTimeout(() => {
+      showTyping('reception-chat', NURSE_AVATAR);
+      setTimeout(() => {
+        hideTyping('reception-chat');
+        if (subFlow) {
+          addChatMsg('reception-chat', 'ai', subFlow.q, NURSE_AVATAR, subFlow.opts);
+          receptionState.subFlow = subFlow;
+          receptionStep = 3;
+        } else {
+          const finalText = receptionState.flow.final || 'ご案内いたします。受付までお越しください。';
+          addChatMsg('reception-chat', 'ai', finalText, NURSE_AVATAR);
+          receptionStep = 99;
+          setTimeout(() => showReceptionEnd(), 1500);
+        }
+      }, 1000);
+    }, 500);
+  } else if (receptionStep === 3) {
+    setTimeout(() => {
+      showTyping('reception-chat', NURSE_AVATAR);
+      setTimeout(() => {
+        hideTyping('reception-chat');
+        const finalText = (receptionState.subFlow && receptionState.subFlow.final)
+          || receptionState.flow.final
+          || 'ご案内いたします。受付までお越しください。';
+        addChatMsg('reception-chat', 'ai', finalText, NURSE_AVATAR);
+        receptionStep = 99;
+        setTimeout(() => showReceptionEnd(), 1500);
+      }, 1200);
+    }, 500);
+  }
+}
+
+function showReceptionEnd() {
+  showTyping('reception-chat', NURSE_AVATAR);
+  setTimeout(() => {
+    hideTyping('reception-chat');
+    addChatMsg('reception-chat', 'ai',
+      'お大事になさってください。<br>何かご不明な点がございましたら、いつでもお声がけくださいね。<br><br>🏥 <em>銀河鉄道病院は、皆様の健康を星のように見守り続けます。</em>',
+      NURSE_AVATAR);
+  }, 800);
+}
+
+/* ===== CONSULTING DEMO ===== */
+let consultStep = 0;
+let consultData = {};
+
+function startConsultingDemo() {
+  consultStep = 0;
+  consultData = {};
+  const chat = document.getElementById('consulting-chat');
+  chat.innerHTML = '';
+  setTimeout(() => {
+    showTyping('consulting-chat', CONSULTANT_AVATAR);
+    setTimeout(() => {
+      hideTyping('consulting-chat');
+      addChatMsg('consulting-chat', 'ai',
+        'はじめまして。病院経営コンサルタントAIの如月です。<br><br>貴院の経営戦略をご一緒に考えさせていただきます。<br>まずはいくつか教えてください。<br><br><strong>貴院の所在地域はどちらですか？</strong>',
+        CONSULTANT_AVATAR,
+        [
+          { label: '都市部（人口50万以上）' },
+          { label: '中核市・地方都市' },
+          { label: '郊外・ベッドタウン' },
+          { label: '過疎地域・へき地' },
+        ]
+      );
+      consultStep = 1;
+    }, 1200);
+  }, 600);
+}
+
+function handleConsultingOption(label) {
+  disableOptions('consulting-chat');
+  addChatMsg('consulting-chat', 'user', label, null);
+
+  if (consultStep === 1) {
+    consultData.region = label;
+    setTimeout(() => {
+      showTyping('consulting-chat', CONSULTANT_AVATAR);
+      setTimeout(() => {
+        hideTyping('consulting-chat');
+        addChatMsg('consulting-chat', 'ai',
+          '<strong>' + label + '</strong>ですね。承知しました。<br><br>次に、<strong>現在の病床数</strong>を教えてください。',
+          CONSULTANT_AVATAR,
+          [
+            { label: '19床以下（有床診療所）' },
+            { label: '20〜99床' },
+            { label: '100〜299床' },
+            { label: '300床以上' },
+          ]
+        );
+        consultStep = 2;
+      }, 1000);
+    }, 500);
+  } else if (consultStep === 2) {
+    consultData.beds = label;
+    setTimeout(() => {
+      showTyping('consulting-chat', CONSULTANT_AVATAR);
+      setTimeout(() => {
+        hideTyping('consulting-chat');
+        addChatMsg('consulting-chat', 'ai',
+          '<strong>' + label + '</strong>。ありがとうございます。<br><br>地域の<strong>人口動態</strong>について伺います。<br>貴院の医療圏では、今後の人口推移はどのような見込みですか？',
+          CONSULTANT_AVATAR,
+          [
+            { label: '人口増加傾向（若年層流入）' },
+            { label: '横ばい' },
+            { label: '緩やかに減少' },
+            { label: '急速に高齢化・過疎化' },
+          ]
+        );
+        consultStep = 3;
+      }, 1000);
+    }, 500);
+  } else if (consultStep === 3) {
+    consultData.population = label;
+    setTimeout(() => {
+      showTyping('consulting-chat', CONSULTANT_AVATAR);
+      setTimeout(() => {
+        hideTyping('consulting-chat');
+        addChatMsg('consulting-chat', 'ai',
+          'なるほど。<strong>' + label + '</strong>という状況ですね。<br><br>現在、<strong>最も課題と感じていること</strong>は何ですか？',
+          CONSULTANT_AVATAR,
+          [
+            { label: '医師・看護師の確保' },
+            { label: '病床稼働率の低下' },
+            { label: '診療報酬・収益改善' },
+            { label: 'DX・IT化の遅れ' },
+          ]
+        );
+        consultStep = 4;
+      }, 1000);
+    }, 500);
+  } else if (consultStep === 4) {
+    consultData.challenge = label;
+    setTimeout(() => {
+      showTyping('consulting-chat', CONSULTANT_AVATAR);
+      setTimeout(() => {
+        hideTyping('consulting-chat');
+        addChatMsg('consulting-chat', 'ai',
+          '最後に、<strong>貴院が目指す方向性</strong>を教えてください。',
+          CONSULTANT_AVATAR,
+          [
+            { label: '急性期の高度医療' },
+            { label: '回復期・地域包括ケア' },
+            { label: '在宅・訪問医療の強化' },
+            { label: '専門特化（がん・心臓等）' },
+          ]
+        );
+        consultStep = 5;
+      }, 1000);
+    }, 500);
+  } else if (consultStep === 5) {
+    consultData.direction = label;
+    setTimeout(() => {
+      showTyping('consulting-chat', CONSULTANT_AVATAR);
+      setTimeout(() => {
+        hideTyping('consulting-chat');
+        const analysis = generateConsultingAnalysis(consultData);
+        addChatMsg('consulting-chat', 'ai', analysis, CONSULTANT_AVATAR);
+        consultStep = 6;
+        setTimeout(() => {
+          showTyping('consulting-chat', CONSULTANT_AVATAR);
+          setTimeout(() => {
+            hideTyping('consulting-chat');
+            addChatMsg('consulting-chat', 'ai',
+              'より詳しい分析レポートをご希望の場合は、JBCCの<strong>個別相談会</strong>にぜひお越しください。<br><br>データに基づいた地域医療分析と、クラウド電子カルテ「blanc」やAI活用による経営改善のご提案を、専門スタッフがご説明いたします。<br><br>ご興味はございますか？',
+              CONSULTANT_AVATAR,
+              [
+                { label: '相談会に参加したい' },
+                { label: 'まずは資料が欲しい' },
+                { label: '今は情報収集段階' },
+              ]
+            );
+            consultStep = 7;
+          }, 1200);
+        }, 2000);
+      }, 2000);
+    }, 500);
+  } else if (consultStep === 7) {
+    setTimeout(() => {
+      showTyping('consulting-chat', CONSULTANT_AVATAR);
+      setTimeout(() => {
+        hideTyping('consulting-chat');
+        let closing = '';
+        if (label === '相談会に参加したい') {
+          closing = 'ありがとうございます！<br>相談会ブースは会場内の「<strong>相談駅</strong>」にございます。<br>担当者がお待ちしておりますので、ぜひお立ち寄りください。';
+        } else if (label === 'まずは資料が欲しい') {
+          closing = '承知しました。<br>JBCCブースの受付で「経営コンサル資料希望」とお伝えいただければ、<br>詳しい資料一式をお渡しいたします。';
+        } else {
+          closing = 'もちろんです。<br>本日のブースでは各コーナーを自由にご覧いただけます。<br>ご質問がございましたら、いつでもお声がけください。';
+        }
+        addChatMsg('consulting-chat', 'ai',
+          closing + '<br><br>本日はお時間をいただきありがとうございました。<br>貴院の発展を心よりお祈りしております。✨',
+          CONSULTANT_AVATAR);
+        consultStep = 99;
+      }, 1000);
+    }, 500);
+  }
+}
+
+function generateConsultingAnalysis(data) {
+  let regionAnalysis = '';
+  let bedStrategy = '';
+  let popStrategy = '';
+  let challengeSolution = '';
+  let directionPlan = '';
+
+  if (data.region === '都市部（人口50万以上）') {
+    regionAnalysis = '都市部では<strong>競合病院が多い</strong>ため、差別化戦略が重要です。専門性の高い医療サービスや、利便性の高いデジタル化が患者獲得の鍵となります。';
+  } else if (data.region === '中核市・地方都市') {
+    regionAnalysis = '中核市では<strong>地域の中核病院</strong>としてのポジショニングが有効です。周辺クリニックとの連携体制を構築し、紹介患者の受け入れ強化が収益改善につながります。';
+  } else if (data.region === '郊外・ベッドタウン') {
+    regionAnalysis = '郊外エリアでは<strong>高齢化の進行</strong>に伴い、回復期・慢性期の需要が増加傾向です。在宅医療との連携モデルが今後の成長エンジンとなります。';
+  } else {
+    regionAnalysis = '過疎地域では<strong>唯一の医療拠点</strong>としての役割が期待されます。オンライン診療やICT活用で医療アクセスを確保しつつ、行政との連携で経営基盤を安定させる戦略が有効です。';
+  }
+
+  if (data.beds.includes('19')) {
+    bedStrategy = '有床診療所の強みは<strong>機動性</strong>です。地域のニーズに素早く対応できる体制づくりが重要です。';
+  } else if (data.beds.includes('20')) {
+    bedStrategy = '中小規模病院では<strong>病床稼働率の最適化</strong>が収益の鍵です。入退院管理の効率化とベッドコントロールの強化をお勧めします。';
+  } else if (data.beds.includes('100')) {
+    bedStrategy = '中規模病院では<strong>機能分化</strong>を明確にし、急性期・回復期の役割を地域内で最適化することが重要です。';
+  } else {
+    bedStrategy = '大規模病院では<strong>高度急性期機能の維持</strong>と<strong>経営効率化</strong>の両立が課題です。DPC分析に基づく在院日数管理と、部門別原価管理の導入をお勧めします。';
+  }
+
+  if (data.challenge === '医師・看護師の確保') {
+    challengeSolution = '人材確保には<strong>働き方改革</strong>が不可欠です。AI・ITによる業務効率化で、医療従事者が本来の業務に集中できる環境づくりが効果的です。電子カルテの導入や生成AIの活用で、文書作成業務を大幅に削減できます。';
+  } else if (data.challenge === '病床稼働率の低下') {
+    challengeSolution = '病床稼働率の改善には<strong>データ分析</strong>が有効です。入退院データの可視化と、地域連携の強化による紹介患者の増加が重要です。クラウド電子カルテによるデータ連携で、地域内の患者フローを最適化できます。';
+  } else if (data.challenge === '診療報酬・収益改善') {
+    challengeSolution = '収益改善には<strong>加算の取りこぼし防止</strong>と<strong>適正な診療報酬請求</strong>が効果的です。AIによる自動チェック機能で、算定漏れを防ぎつつコンプライアンスも強化できます。';
+  } else {
+    challengeSolution = 'DX推進は<strong>段階的なアプローチ</strong>が成功のポイントです。まずクラウド電子カルテで基盤を整え、次にAI活用で業務効率化、最終的にはデータドリブンな経営判断へとステップアップする計画をお勧めします。';
+  }
+
+  return '<div style="border-left: 3px solid var(--color-ai); padding-left: 1rem; margin-bottom: 0.8rem;"><strong style="color: var(--color-ai);">📊 経営分析レポート</strong></div>'
+    + '<strong>▸ 地域分析</strong><br>' + regionAnalysis + '<br><br>'
+    + '<strong>▸ 病床戦略</strong><br>' + bedStrategy + '<br><br>'
+    + '<strong>▸ 人口動態への対応</strong><br>「' + data.population + '」の傾向を踏まえ、中長期の病床機能計画の見直しをお勧めします。<br><br>'
+    + '<strong>▸ 課題への提案</strong><br>' + challengeSolution + '<br><br>'
+    + '<strong>▸ 方向性：' + data.direction + '</strong><br>この方向性は地域のニーズと整合性があります。JBCCのソリューションで実現を支援できます。';
+}
+
+function handleDemoOption(btn, container) {
+  const label = btn.textContent;
+  btn.classList.add('selected');
+  if (container === 'reception-chat') {
+    handleReceptionOption(label);
+  } else if (container === 'consulting-chat') {
+    handleConsultingOption(label);
+  }
+}
+
+function init() {
+  initStarfield();
+  updateSlideshow();
+  startWelcomeTyping();
+  setInterval(shootingStar, 4000 + Math.random() * 3000);
+  setTimeout(shootingStar, 2000);
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>

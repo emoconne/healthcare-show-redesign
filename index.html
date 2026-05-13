@@ -38,8 +38,9 @@ body {
   font-family: 'Noto Sans JP', sans-serif;
   background: var(--color-bg);
   color: var(--color-text);
-  overflow-x: hidden;
-  min-height: 100vh;
+  overflow: hidden;
+  height: 100vh;
+  max-height: 100vh;
 }
 
 /* ===== STARFIELD ===== */
@@ -78,8 +79,10 @@ body {
 /* ===== SCREEN SYSTEM ===== */
 .screen {
   display: none;
-  min-height: 100vh;
-  padding: 2rem;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  padding: 1.5rem 2rem;
   animation: screenIn 0.6s var(--transition) both;
 }
 .screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -90,21 +93,34 @@ body {
 
 /* ===== HERO / WELCOME ===== */
 .hero {
-  text-align: center;
-  max-width: 1200px;
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  max-width: 1400px;
   width: 100%;
+}
+.hero-left {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.hero-right {
+  flex: 1;
+  text-align: left;
+  min-width: 0;
 }
 .hero-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 1.5rem;
+  padding: 0.4rem 1.2rem;
   background: var(--color-primary-dim);
   border: 1px solid rgba(110, 231, 255, 0.3);
   border-radius: 100px;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: var(--color-primary);
-  margin-bottom: 2rem;
+  margin-bottom: 0.8rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   font-family: 'Orbitron', sans-serif;
@@ -121,10 +137,10 @@ body {
 }
 .hero-title {
   font-family: 'Orbitron', sans-serif;
-  font-size: clamp(2.5rem, 1rem + 6vw, 6rem);
+  font-size: clamp(3rem, 2rem + 5vw, 7rem);
   font-weight: 900;
-  line-height: 1.1;
-  margin-bottom: 1rem;
+  line-height: 1.05;
+  margin-bottom: 0.5rem;
   background: linear-gradient(135deg, #6ee7ff 0%, #c084fc 50%, #f472b6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -132,63 +148,63 @@ body {
   filter: drop-shadow(0 0 30px rgba(110, 231, 255, 0.3));
 }
 .hero-subtitle {
-  font-size: clamp(1.2rem, 0.8rem + 1.5vw, 2rem);
+  font-size: clamp(1.1rem, 0.8rem + 1vw, 1.6rem);
   font-weight: 300;
   color: var(--color-text-dim);
-  margin-bottom: 1rem;
+  margin-bottom: 0.4rem;
 }
 .hero-company {
-  font-size: clamp(1rem, 0.7rem + 1vw, 1.4rem);
+  font-size: clamp(0.85rem, 0.6rem + 0.8vw, 1.2rem);
   color: var(--color-gold);
   font-weight: 500;
-  margin-bottom: 3rem;
+  margin-bottom: 1.2rem;
   letter-spacing: 0.3em;
 }
 
 /* ===== AVATAR ===== */
 .avatar-container {
   position: relative;
-  width: 200px; height: 200px;
-  margin: 0 auto 2rem;
+  width: min(280px, 35vh); height: min(280px, 35vh);
+  margin: 0 auto;
 }
 .avatar-ring {
   position: absolute; inset: 0;
   border-radius: 50%;
-  border: 2px solid rgba(110, 231, 255, 0.3);
+  border: 3px solid rgba(110, 231, 255, 0.35);
   animation: avatarRing 4s linear infinite;
 }
 .avatar-ring::before {
   content: '';
   position: absolute;
-  top: -4px; left: 50%;
-  width: 8px; height: 8px;
+  top: -6px; left: 50%;
+  width: 12px; height: 12px;
   background: var(--color-primary);
   border-radius: 50%;
-  box-shadow: 0 0 12px var(--color-primary);
+  box-shadow: 0 0 20px var(--color-primary);
 }
 @keyframes avatarRing { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 .avatar-ring-2 {
-  position: absolute; inset: -12px;
+  position: absolute; inset: -16px;
   border-radius: 50%;
-  border: 1px solid rgba(192, 132, 252, 0.2);
+  border: 2px solid rgba(192, 132, 252, 0.25);
   animation: avatarRing 6s linear infinite reverse;
 }
 .avatar-ring-2::before {
   content: '';
   position: absolute;
-  top: -3px; left: 50%;
-  width: 6px; height: 6px;
+  top: -5px; left: 50%;
+  width: 10px; height: 10px;
   background: var(--color-accent);
   border-radius: 50%;
-  box-shadow: 0 0 10px var(--color-accent);
+  box-shadow: 0 0 14px var(--color-accent);
 }
 .avatar-body {
-  position: absolute; inset: 16px;
+  position: absolute; inset: 24px;
   border-radius: 50%;
   background: linear-gradient(135deg, #1a1a3e, #2a1a4e);
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
-  box-shadow: inset 0 0 40px rgba(110, 231, 255, 0.1);
+  box-shadow: inset 0 0 60px rgba(110, 231, 255, 0.12);
 }
 .avatar-face {
   position: relative;
@@ -196,22 +212,22 @@ body {
   display: flex; align-items: center; justify-content: center; flex-direction: column;
 }
 .avatar-eyes {
-  display: flex; gap: 24px;
-  margin-bottom: 8px;
+  display: flex; gap: 40px;
+  margin-bottom: 12px;
 }
 .avatar-eye {
-  width: 18px; height: 18px;
+  width: 28px; height: 28px;
   background: var(--color-primary);
   border-radius: 50%;
-  box-shadow: 0 0 15px var(--color-primary), 0 0 30px rgba(110, 231, 255, 0.3);
+  box-shadow: 0 0 20px var(--color-primary), 0 0 40px rgba(110, 231, 255, 0.3);
   animation: blink 4s ease-in-out infinite;
   position: relative;
 }
 .avatar-eye::after {
   content: '';
   position: absolute;
-  top: 3px; left: 5px;
-  width: 6px; height: 6px;
+  top: 5px; left: 8px;
+  width: 9px; height: 9px;
   background: white;
   border-radius: 50%;
   opacity: 0.8;
@@ -221,35 +237,35 @@ body {
   50% { transform: scaleY(0.1); }
 }
 .avatar-mouth {
-  width: 30px; height: 14px;
-  border: 2px solid var(--color-primary);
+  width: 44px; height: 20px;
+  border: 3px solid var(--color-primary);
   border-top: none;
-  border-radius: 0 0 20px 20px;
-  margin-top: 4px;
+  border-radius: 0 0 24px 24px;
+  margin-top: 6px;
   opacity: 0.8;
 }
 .avatar-mouth.speaking {
   animation: speak 0.3s ease-in-out infinite alternate;
 }
 @keyframes speak {
-  0% { height: 8px; width: 24px; }
-  100% { height: 16px; width: 32px; }
+  0% { height: 12px; width: 36px; }
+  100% { height: 24px; width: 48px; }
 }
 .avatar-antenna {
   position: absolute;
-  top: 8px; left: 50%;
+  top: 10px; left: 50%;
   transform: translateX(-50%);
-  width: 2px; height: 20px;
+  width: 3px; height: 32px;
   background: linear-gradient(to top, var(--color-primary), transparent);
 }
 .avatar-antenna::after {
   content: '';
   position: absolute;
-  top: -4px; left: -3px;
-  width: 8px; height: 8px;
+  top: -6px; left: -5px;
+  width: 13px; height: 13px;
   background: var(--color-accent);
   border-radius: 50%;
-  box-shadow: 0 0 10px var(--color-accent);
+  box-shadow: 0 0 14px var(--color-accent);
   animation: antennaPulse 2s ease-in-out infinite;
 }
 @keyframes antennaPulse {
@@ -287,13 +303,13 @@ body {
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(110, 231, 255, 0.2);
   border-radius: var(--radius-lg);
-  padding: 2rem 2.5rem;
-  max-width: 800px;
+  padding: 1rem 1.5rem;
+  max-width: 100%;
   width: 100%;
-  margin: 2rem auto;
-  font-size: clamp(1.1rem, 0.8rem + 1vw, 1.5rem);
-  line-height: 1.8;
-  text-align: center;
+  margin: 0.8rem 0;
+  font-size: clamp(0.95rem, 0.7rem + 0.8vw, 1.2rem);
+  line-height: 1.7;
+  text-align: left;
   box-shadow: var(--glow-primary), inset 0 1px 0 rgba(255,255,255,0.05);
 }
 .speech-bubble::before {
@@ -323,10 +339,10 @@ body {
 .cta-btn {
   display: inline-flex;
   align-items: center; gap: 0.75rem;
-  padding: 1rem 2.5rem;
+  padding: 0.8rem 2rem;
   background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
   color: var(--color-bg);
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 700;
   border: none;
   border-radius: 100px;
@@ -335,7 +351,7 @@ body {
   text-decoration: none;
   box-shadow: 0 4px 20px rgba(110, 231, 255, 0.3);
   font-family: 'Noto Sans JP', sans-serif;
-  margin-top: 1.5rem;
+  margin-top: 0.6rem;
 }
 .cta-btn:hover {
   transform: translateY(-2px) scale(1.03);
@@ -347,7 +363,9 @@ body {
 .slideshow {
   width: 100%;
   max-width: 1100px;
-  margin: 2rem auto;
+  margin: 0.3rem auto;
+  flex: 1;
+  min-height: 0;
   position: relative;
   overflow: hidden;
   border-radius: var(--radius-lg);
@@ -358,18 +376,18 @@ body {
 }
 .slide {
   min-width: 100%;
-  padding: 3rem;
+  padding: 1.5rem 2rem;
   background: var(--color-surface-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(110, 231, 255, 0.15);
   display: flex;
   align-items: center;
-  gap: 3rem;
+  gap: 2rem;
 }
 .slide-visual {
-  flex: 0 0 300px;
-  height: 300px;
+  flex: 0 0 200px;
+  height: 200px;
   border-radius: var(--radius);
   display: flex; align-items: center; justify-content: center;
   position: relative;
@@ -423,7 +441,8 @@ body {
   justify-content: center;
   align-items: center;
   gap: 1rem;
-  margin-top: 1.5rem;
+  margin-top: 0.5rem;
+  flex-shrink: 0;
 }
 .slideshow-dot {
   width: 12px; height: 12px;
@@ -457,11 +476,11 @@ body {
 /* ===== SCENARIO CARDS ===== */
 .scenario-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
   max-width: 1200px;
   width: 100%;
-  margin: 2rem auto;
+  margin: 0.5rem auto 0;
 }
 .scenario-card {
   position: relative;
@@ -470,7 +489,7 @@ body {
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(110, 231, 255, 0.15);
   border-radius: var(--radius-lg);
-  padding: 2rem;
+  padding: 1.2rem 1.5rem;
   cursor: pointer;
   transition: all var(--transition);
   overflow: hidden;
@@ -491,11 +510,11 @@ body {
 }
 .scenario-card:hover::before { opacity: 1; }
 .scenario-card-icon {
-  width: 64px; height: 64px;
-  border-radius: 16px;
+  width: 48px; height: 48px;
+  border-radius: 12px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.8rem;
-  margin-bottom: 1.2rem;
+  font-size: 1.4rem;
+  margin-bottom: 0.6rem;
 }
 .scenario-card-station {
   font-family: 'Orbitron', sans-serif;
@@ -533,60 +552,61 @@ body {
 .detail-header {
   text-align: center;
   max-width: 800px;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 .detail-back {
   display: inline-flex;
   align-items: center; gap: 0.5rem;
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 0.8rem;
   border-radius: 100px;
   border: 1px solid rgba(110, 231, 255, 0.2);
   background: transparent;
   color: var(--color-primary);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-bottom: 2rem;
+  margin-bottom: 0.5rem;
   font-family: 'Noto Sans JP', sans-serif;
+  flex-shrink: 0;
 }
 .detail-back:hover {
   background: var(--color-primary-dim);
   border-color: var(--color-primary);
 }
 .detail-icon {
-  width: 100px; height: 100px;
-  border-radius: 24px;
+  width: 72px; height: 72px;
+  border-radius: 18px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 3rem;
-  margin: 0 auto 1.5rem;
+  font-size: 2.2rem;
+  margin: 0 auto 0.8rem;
 }
 .detail-station {
   font-family: 'Orbitron', sans-serif;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   letter-spacing: 0.2em;
   color: var(--color-primary);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.3rem;
 }
 .detail-title {
-  font-size: clamp(1.8rem, 1rem + 3vw, 3rem);
+  font-size: clamp(1.5rem, 1rem + 2.5vw, 2.5rem);
   font-weight: 900;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 .detail-desc {
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: var(--color-text-dim);
-  line-height: 1.8;
+  line-height: 1.6;
   max-width: 700px;
-  margin: 0 auto 2rem;
+  margin: 0 auto 1rem;
 }
 
 .detail-features {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
   max-width: 900px;
   width: 100%;
-  margin: 0 auto 2rem;
+  margin: 0 auto 1rem;
 }
 .detail-feature {
   background: var(--color-surface-glass);
@@ -594,7 +614,7 @@ body {
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(110, 231, 255, 0.1);
   border-radius: var(--radius);
-  padding: 1.5rem;
+  padding: 1rem;
   text-align: left;
 }
 .detail-feature-title {
@@ -640,66 +660,109 @@ body {
 /* ===== TRAIN LINE ===== */
 .train-line {
   position: relative;
-  max-width: 1000px;
+  max-width: 1200px;
   width: 100%;
-  margin: 3rem auto;
-  padding: 2rem 0;
+  margin: 0.8rem auto;
+  padding: 2.5rem 0 1rem;
 }
 .train-track {
   position: absolute;
   top: 50%;
-  left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(110, 231, 255, 0.3), transparent);
+  left: 2%; right: 2%;
+  height: 3px;
+  background: rgba(110, 231, 255, 0.25);
+  box-shadow: 0 0 8px rgba(110, 231, 255, 0.1);
 }
-.train-track::before {
+/* Railroad ties */
+.train-track::after {
   content: '';
   position: absolute;
-  top: -1px;
-  left: 0;
-  width: 30%;
-  height: 4px;
-  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
-  border-radius: 2px;
-  animation: trainMove 8s linear infinite;
-  box-shadow: 0 0 15px var(--color-primary);
+  top: -4px; left: 0; right: 0;
+  height: 11px;
+  background: repeating-linear-gradient(90deg,
+    transparent 0px, transparent 20px,
+    rgba(110, 231, 255, 0.12) 20px, rgba(110, 231, 255, 0.12) 23px
+  );
 }
+/* SL Locomotive */
+.train-sl {
+  position: absolute;
+  top: 50%; left: 0;
+  transform: translateY(-50%);
+  animation: trainMove 10s linear infinite;
+  z-index: 2;
+  filter: drop-shadow(0 0 12px rgba(110, 231, 255, 0.5));
+}
+.train-sl svg { display: block; }
 @keyframes trainMove {
-  0% { left: -30%; }
+  0% { left: -8%; }
   100% { left: 100%; }
+}
+/* Steam puffs */
+.train-steam {
+  position: absolute;
+  top: -18px; left: 8px;
+  display: flex; gap: 4px;
+}
+.train-steam-puff {
+  width: 8px; height: 8px;
+  background: rgba(110, 231, 255, 0.25);
+  border-radius: 50%;
+  animation: steamPuff 1.5s ease-out infinite;
+}
+.train-steam-puff:nth-child(2) { animation-delay: 0.3s; width: 10px; height: 10px; }
+.train-steam-puff:nth-child(3) { animation-delay: 0.6s; width: 6px; height: 6px; }
+@keyframes steamPuff {
+  0% { opacity: 0.6; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-20px) scale(2.5); }
 }
 .train-stations {
   display: flex;
   justify-content: space-around;
   position: relative;
-  z-index: 1;
+  z-index: 3;
 }
 .train-station {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  padding: 0.3rem 0.5rem;
 }
-.train-station:hover { transform: translateY(-4px); }
+.train-station:hover { transform: translateY(-6px); }
 .train-station-dot {
-  width: 16px; height: 16px;
+  width: 24px; height: 24px;
   border-radius: 50%;
-  border: 2px solid var(--color-primary);
+  border: 3px solid var(--color-primary);
   background: var(--color-bg);
-  box-shadow: 0 0 10px rgba(110, 231, 255, 0.3);
+  box-shadow: 0 0 14px rgba(110, 231, 255, 0.3);
   transition: all 0.3s ease;
+  position: relative;
+}
+.train-station-dot::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: transparent;
+  transition: background 0.3s ease;
 }
 .train-station:hover .train-station-dot {
   background: var(--color-primary);
-  box-shadow: 0 0 20px var(--color-primary);
+  box-shadow: 0 0 24px var(--color-primary);
+  transform: scale(1.15);
+}
+.train-station:hover .train-station-dot::after {
+  background: white;
 }
 .train-station-name {
-  font-size: 0.8rem;
-  font-weight: 500;
+  font-size: 1.05rem;
+  font-weight: 700;
   text-align: center;
-  max-width: 80px;
+  max-width: 100px;
+  letter-spacing: 0.05em;
 }
 
 /* ===== AVATAR SPEECH FLOATING ===== */
@@ -769,7 +832,7 @@ body {
 }
 .staff-photo-wrap {
   position: relative;
-  width: 64px; height: 64px;
+  width: 80px; height: 80px;
   flex-shrink: 0;
 }
 .staff-photo-ring {
@@ -779,7 +842,7 @@ body {
   animation: avatarRing 6s linear infinite;
 }
 .staff-photo {
-  width: 64px; height: 64px;
+  width: 80px; height: 80px;
   border-radius: 50%;
   object-fit: cover;
   object-position: center top;
@@ -849,7 +912,7 @@ body {
   z-index: 2;
 }
 .staff-speech-photo {
-  width: 44px; height: 44px;
+  width: 56px; height: 56px;
   border-radius: 50%;
   object-fit: cover;
   object-position: center top;
@@ -906,55 +969,123 @@ body {
 
 /* ===== BOOTH INTRO SCREEN (Avatar narrated) ===== */
 .booth-intro-container {
-  max-width: 1000px;
+  max-width: 1400px;
   width: 100%;
-  text-align: center;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
-.booth-intro-avatar {
-  width: 140px; height: 140px;
-  margin: 0 auto 1.5rem;
+/* Small robot inside slideshow */
+.slideshow-robot {
+  position: absolute;
+  top: 0.8rem; right: 0.8rem;
+  width: 64px; height: 64px;
+  z-index: 10;
 }
-.booth-intro-avatar .avatar-ring { border-width: 1.5px; }
-.booth-intro-avatar .avatar-ring::before { width: 6px; height: 6px; top: -3px; }
-.booth-intro-avatar .avatar-ring-2 { inset: -10px; }
-.booth-intro-avatar .avatar-ring-2::before { width: 5px; height: 5px; top: -2px; }
-.booth-intro-avatar .avatar-body { inset: 12px; }
-.booth-intro-avatar .avatar-eyes { gap: 16px; margin-bottom: 5px; }
-.booth-intro-avatar .avatar-eye { width: 12px; height: 12px; }
-.booth-intro-avatar .avatar-eye::after { width: 4px; height: 4px; top: 2px; left: 3px; }
-.booth-intro-avatar .avatar-mouth { width: 20px; height: 10px; margin-top: 3px; }
-.booth-intro-avatar .avatar-antenna { height: 14px; top: 5px; }
-.booth-intro-avatar .avatar-antenna::after { width: 6px; height: 6px; top: -3px; left: -2px; }
 
 /* ===== DEMO CHAT INTERFACE ===== */
 .demo-screen {
-  max-width: 900px;
+  max-width: 1400px;
   width: 100%;
-  padding-top: 1rem;
+  display: flex;
+  gap: 0;
+  height: 100%;
+  min-height: 0;
+}
+.demo-avatar-panel {
+  flex: 0 0 33%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  background: rgba(12, 12, 30, 0.5);
+  border: 1px solid rgba(110, 231, 255, 0.1);
+  border-right: none;
+}
+.demo-avatar-panel::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center 40%, rgba(110, 231, 255, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.demo-avatar-wrap {
+  position: relative;
+  width: 80%;
+  max-width: 320px;
+  aspect-ratio: 3/4;
+}
+.demo-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  border-radius: var(--radius-lg);
+  filter: brightness(1.05);
+  position: relative;
+  z-index: 1;
+}
+.demo-avatar-glow {
+  position: absolute; inset: -4px;
+  border-radius: calc(var(--radius-lg) + 4px);
+  background: linear-gradient(135deg, rgba(110, 231, 255, 0.3), rgba(192, 132, 252, 0.3));
+  z-index: 0;
+  opacity: 0.6;
+  animation: avatarGlowPulse 3s ease-in-out infinite;
+}
+@keyframes avatarGlowPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+.demo-avatar-name {
+  margin-top: 1rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: center;
+  z-index: 1;
+}
+.demo-avatar-role {
+  font-size: 0.8rem;
+  color: var(--color-primary);
+  letter-spacing: 0.1em;
+  z-index: 1;
+}
+.demo-right-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  padding: 1rem 1.5rem;
 }
 .demo-header {
-  text-align: center;
-  margin-bottom: 1.5rem;
+  text-align: left;
+  margin-bottom: 0.5rem;
+  flex-shrink: 0;
 }
 .demo-header-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.35rem 1rem;
+  padding: 0.3rem 0.8rem;
   border-radius: 100px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   font-family: 'Orbitron', sans-serif;
-  margin-bottom: 1rem;
+  margin-bottom: 0.4rem;
 }
 .demo-title {
-  font-size: clamp(1.4rem, 1rem + 2vw, 2.2rem);
+  font-size: clamp(1.2rem, 0.8rem + 2vw, 1.8rem);
   font-weight: 900;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.2rem;
 }
 .demo-subtitle {
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   color: var(--color-text-dim);
 }
 .demo-chat-area {
@@ -963,14 +1094,14 @@ body {
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(110, 231, 255, 0.12);
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  min-height: 420px;
-  max-height: 520px;
+  padding: 1rem;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.8rem;
   scroll-behavior: smooth;
 }
 .demo-chat-area::-webkit-scrollbar { width: 4px; }
@@ -994,7 +1125,8 @@ body {
   object-fit: cover;
   object-position: center top;
   flex-shrink: 0;
-  border: 1.5px solid rgba(110, 231, 255, 0.3);
+  border: 2px solid rgba(110, 231, 255, 0.3);
+  box-shadow: 0 0 12px rgba(110, 231, 255, 0.12);
 }
 .chat-avatar.user-icon {
   background: linear-gradient(135deg, rgba(110, 231, 255, 0.2), rgba(192, 132, 252, 0.2));
@@ -1091,22 +1223,23 @@ body {
   justify-content: center;
   gap: 1rem;
   flex-wrap: wrap;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
+  flex-shrink: 0;
 }
 
 /* Demo entry cards on welcome */
 .demo-entries {
   display: flex;
-  gap: 1rem;
-  justify-content: center;
+  gap: 0.8rem;
+  justify-content: flex-start;
   flex-wrap: wrap;
-  margin-top: 1.5rem;
+  margin-top: 0.8rem;
 }
 .demo-entry-card {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
-  padding: 0.7rem 1.2rem;
+  gap: 0.6rem;
+  padding: 0.5rem 1rem;
   background: rgba(12, 12, 30, 0.6);
   border: 1px solid rgba(110, 231, 255, 0.15);
   border-radius: 100px;
@@ -1121,18 +1254,19 @@ body {
   transform: translateY(-2px);
 }
 .demo-entry-avatar {
-  width: 36px; height: 36px;
+  width: 56px; height: 56px;
   border-radius: 50%;
   object-fit: cover;
   object-position: center top;
-  border: 1.5px solid rgba(110, 231, 255, 0.3);
+  border: 2px solid rgba(110, 231, 255, 0.3);
+  box-shadow: 0 0 12px rgba(110, 231, 255, 0.15);
 }
 .demo-entry-text {
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: 1.05rem;
+  font-weight: 700;
 }
 .demo-entry-sub {
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   color: var(--color-text-dim);
 }
 
@@ -1158,26 +1292,35 @@ body {
 }
 
 /* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-  .slide { flex-direction: column; padding: 2rem; gap: 1.5rem; }
-  .slide-visual { flex: none; width: 100%; height: 180px; }
-  .scenario-grid { grid-template-columns: 1fr; }
-  .train-stations { flex-wrap: wrap; gap: 1.5rem; }
+@media (max-width: 900px) {
+  .hero { flex-direction: column; gap: 1rem; text-align: center; }
+  .hero-right { text-align: center; }
+  .avatar-container { width: 160px; height: 160px; }
+  .demo-entries { justify-content: center; }
+  .slideshow-robot { width: 48px; height: 48px; }
+  .slide { flex-direction: column; padding: 1.5rem; gap: 1rem; }
+  .slide-visual { flex: none; width: 100%; height: 140px; }
+  .scenario-grid { grid-template-columns: 1fr 1fr; }
+  .train-stations { flex-wrap: wrap; gap: 0.8rem; }
   .train-track { display: none; }
-  .avatar-sm { width: 60px; height: 60px; bottom: 1rem; right: 1rem; }
-  .avatar-speech-float { right: 1rem; bottom: 5rem; max-width: 250px; }
+  .train-sl { display: none; }
+  .train-station-name { font-size: 0.9rem; }
+  .avatar-sm { width: 50px; height: 50px; bottom: 1rem; right: 1rem; }
+  .avatar-speech-float { right: 1rem; bottom: 4.5rem; max-width: 250px; }
   .staff-panel { bottom: 1rem; right: 1rem; }
-  .staff-card { min-width: 220px; padding: 0.6rem 0.8rem 0.6rem 0.6rem; }
-  .staff-photo-wrap { width: 48px; height: 48px; }
-  .staff-photo { width: 48px; height: 48px; }
-  .staff-speech { max-width: 270px; }
-  .staff-speech-photo { width: 36px; height: 36px; }
+  .staff-card { min-width: 200px; padding: 0.5rem 0.7rem 0.5rem 0.5rem; }
+  .staff-photo-wrap { width: 52px; height: 52px; }
+  .staff-photo { width: 52px; height: 52px; }
+  .staff-speech { max-width: 260px; }
+  .staff-speech-photo { width: 40px; height: 40px; }
   .detail-features { grid-template-columns: 1fr; }
-  .demo-screen { padding-top: 0; }
-  .demo-chat-area { min-height: 350px; max-height: 420px; padding: 1rem; }
+  .demo-screen { flex-direction: column; }
+  .demo-avatar-panel { flex: 0 0 auto; height: 120px; flex-direction: row; gap: 1rem; padding: 0.5rem 1rem; border-radius: var(--radius-lg) var(--radius-lg) 0 0; border-right: 1px solid rgba(110,231,255,0.1); border-bottom: none; }
+  .demo-avatar-wrap { width: 80px; max-width: 80px; aspect-ratio: 1; }
+  .demo-right-panel { padding: 0.5rem 0.8rem; }
+  .demo-chat-area { padding: 0.8rem; }
   .chat-msg { max-width: 95%; }
-  .chat-avatar { width: 36px; height: 36px; }
-  .demo-entries { flex-direction: column; align-items: center; }
+  .chat-avatar { width: 48px; height: 48px; }
 }
 
 @media (min-width: 1600px) {
@@ -1225,45 +1368,51 @@ body {
   <!-- ===== SCREEN 1: WELCOME ===== -->
   <div class="screen active" id="screen-welcome">
     <div class="hero">
-      <div class="hero-badge"><span class="dot"></span> HOSPITAL SHOW 2026</div>
-      <div class="avatar-container" id="main-avatar">
-        <div class="avatar-ring"></div>
-        <div class="avatar-ring-2"></div>
-        <div class="avatar-body">
-          <div class="avatar-face">
-            <div class="avatar-antenna"></div>
-            <div class="avatar-eyes">
-              <div class="avatar-eye"></div>
-              <div class="avatar-eye"></div>
+      <div class="hero-left">
+        <div class="avatar-container" id="main-avatar">
+          <div class="avatar-ring"></div>
+          <div class="avatar-ring-2"></div>
+          <div class="avatar-body">
+            <div class="avatar-face">
+              <div class="avatar-antenna"></div>
+              <div class="avatar-eyes">
+                <div class="avatar-eye"></div>
+                <div class="avatar-eye"></div>
+              </div>
+              <div class="avatar-mouth" id="main-mouth"></div>
             </div>
-            <div class="avatar-mouth" id="main-mouth"></div>
           </div>
         </div>
       </div>
-      <h1 class="hero-title">銀河鉄道</h1>
-      <p class="hero-subtitle">ヘルスケアの未来へ、ご一緒に。</p>
-      <p class="hero-company">J B C C 株 式 会 社</p>
-      <div class="speech-bubble" id="welcome-speech">
-        <span class="speech-typing" id="welcome-text"></span>
-        <span class="speech-cursor"></span>
-      </div>
-      <button class="cta-btn" onclick="navigateTo('screen-booth-intro')">
-        乗車する
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </button>
-      <div class="demo-entries">
-        <div class="demo-entry-card" onclick="navigateTo('screen-demo-reception')">
-          <img class="demo-entry-avatar" src="avatars/nurse.png" alt="">
-          <div>
-            <div class="demo-entry-text">受付案内デモ</div>
-            <div class="demo-entry-sub">銀河鉄道病院</div>
-          </div>
+      <div class="hero-right">
+        <div class="hero-badge"><span class="dot"></span> HOSPITAL SHOW 2026</div>
+        <h1 class="hero-title">銀河鉄道</h1>
+        <p class="hero-subtitle">ヘルスケアの未来へ、ご一緒に。</p>
+        <p class="hero-company">J B C C 株 式 会 社</p>
+        <div class="speech-bubble" id="welcome-speech">
+          <span class="speech-typing" id="welcome-text"></span>
+          <span class="speech-cursor"></span>
         </div>
-        <div class="demo-entry-card" onclick="navigateTo('screen-demo-consulting')">
-          <img class="demo-entry-avatar" src="avatars/consultant.png" alt="">
-          <div>
-            <div class="demo-entry-text">経営コンサルデモ</div>
-            <div class="demo-entry-sub">病院経営支援AI</div>
+        <div style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap;">
+          <button class="cta-btn" onclick="navigateTo('screen-scenario')">
+            乗車する
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+          <div class="demo-entries">
+            <div class="demo-entry-card" onclick="navigateTo('screen-demo-reception')">
+              <img class="demo-entry-avatar" src="avatars/nurse.png" alt="">
+              <div>
+                <div class="demo-entry-text">受付案内デモ</div>
+                <div class="demo-entry-sub">銀河鉄道病院</div>
+              </div>
+            </div>
+            <div class="demo-entry-card" onclick="navigateTo('screen-demo-consulting')">
+              <img class="demo-entry-avatar" src="avatars/consultant.png" alt="">
+              <div>
+                <div class="demo-entry-text">経営コンサルデモ</div>
+                <div class="demo-entry-sub">病院経営支援AI</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1273,33 +1422,25 @@ body {
   <!-- ===== SCREEN 2: BOOTH INTRO (Avatar narrated slideshow) ===== -->
   <div class="screen" id="screen-booth-intro">
     <div class="booth-intro-container">
-      <button class="detail-back" onclick="navigateTo('screen-welcome')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        ホームへ戻る
-      </button>
-
-      <div class="avatar-container booth-intro-avatar">
-        <div class="avatar-ring"></div>
-        <div class="avatar-ring-2"></div>
-        <div class="avatar-body">
-          <div class="avatar-face">
-            <div class="avatar-antenna"></div>
-            <div class="avatar-eyes">
-              <div class="avatar-eye"></div>
-              <div class="avatar-eye"></div>
-            </div>
-            <div class="avatar-mouth speaking" id="intro-mouth"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="speech-bubble" id="booth-speech" style="margin-bottom: 2rem;">
-        <span class="speech-typing" id="booth-speech-text"></span>
-        <span class="speech-cursor"></span>
-      </div>
-
       <!-- SLIDESHOW -->
       <div class="slideshow">
+        <!-- Small robot in corner -->
+        <div class="slideshow-robot">
+          <div class="avatar-container" style="width:100%;height:100%;">
+            <div class="avatar-ring"></div>
+            <div class="avatar-ring-2" style="inset:-6px;"></div>
+            <div class="avatar-body" style="inset:8px;">
+              <div class="avatar-face">
+                <div class="avatar-antenna" style="height:10px;top:3px;width:1.5px;"></div>
+                <div class="avatar-eyes" style="gap:10px;margin-bottom:3px;">
+                  <div class="avatar-eye" style="width:7px;height:7px;"></div>
+                  <div class="avatar-eye" style="width:7px;height:7px;"></div>
+                </div>
+                <div class="avatar-mouth speaking" id="intro-mouth" style="width:12px;height:6px;margin-top:1px;border-width:1.5px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="slideshow-track" id="slideshow-track">
           <!-- Slide 1: blanc general -->
           <div class="slide">
@@ -1429,40 +1570,75 @@ body {
           </div>
         </div>
       </div>
-      <div class="slideshow-nav">
-        <button class="slideshow-arrow" onclick="slideMove(-1)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-top:0.5rem; flex-shrink:0;">
+        <button class="detail-back" onclick="navigateTo('screen-welcome')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          ホームへ戻る
         </button>
-        <div id="slideshow-dots"></div>
-        <button class="slideshow-arrow" onclick="slideMove(1)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-        </button>
-      </div>
-
-      <div style="margin-top: 2.5rem;">
-        <button class="cta-btn" onclick="navigateTo('screen-scenario')">
+        <div class="slideshow-nav" style="margin-top:0;">
+          <button class="slideshow-arrow" onclick="slideMove(-1)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <div id="slideshow-dots"></div>
+          <button class="slideshow-arrow" onclick="slideMove(1)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+        <button class="cta-btn" onclick="navigateTo('screen-scenario')" style="margin-top:0;">
           ご案内を開始する
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
       </div>
+
     </div>
   </div>
 
   <!-- ===== SCREEN 3: SCENARIO SELECT ===== -->
   <div class="screen" id="screen-scenario">
-    <div style="text-align:center; max-width:800px; margin-bottom: 1rem;">
-      <button class="detail-back" onclick="navigateTo('screen-booth-intro')">
+    <div style="text-align:center; max-width:800px; margin-bottom: 0;">
+      <button class="detail-back" onclick="navigateTo('screen-welcome')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        ブース紹介へ戻る
+        トップへ戻る
       </button>
       <div class="detail-station">JBCC GALAXY RAILWAY</div>
-      <h2 class="detail-title" style="font-size: clamp(1.6rem, 1rem + 2.5vw, 2.8rem);">本日はどのようなことをお探しですか？</h2>
-      <p class="detail-desc" style="font-size: 1rem;">気になるテーマを選んでください。最適な「駅」へご案内いたします。</p>
+      <h2 class="detail-title" style="font-size: clamp(1.4rem, 1rem + 2vw, 2.4rem);">どちらの駅へご案内しましょうか？</h2>
+      <p class="detail-desc" style="font-size: 0.95rem; margin-bottom: 0;">銀河鉄道に乗って、気になるテーマの駅へ出発しましょう。</p>
     </div>
 
     <!-- Train Line Visual -->
     <div class="train-line">
       <div class="train-track"></div>
+      <!-- SL Locomotive -->
+      <div class="train-sl">
+        <div class="train-steam">
+          <div class="train-steam-puff"></div>
+          <div class="train-steam-puff"></div>
+          <div class="train-steam-puff"></div>
+        </div>
+        <svg width="56" height="32" viewBox="0 0 56 32" fill="none">
+          <!-- Boiler -->
+          <rect x="8" y="8" width="28" height="16" rx="4" fill="rgba(110,231,255,0.15)" stroke="var(--color-primary)" stroke-width="1.5"/>
+          <!-- Chimney -->
+          <rect x="12" y="2" width="6" height="8" rx="1" fill="rgba(110,231,255,0.2)" stroke="var(--color-primary)" stroke-width="1"/>
+          <!-- Cab -->
+          <rect x="36" y="4" width="14" height="20" rx="2" fill="rgba(192,132,252,0.15)" stroke="var(--color-accent)" stroke-width="1.5"/>
+          <!-- Window -->
+          <rect x="39" y="7" width="8" height="6" rx="1" fill="rgba(110,231,255,0.3)" stroke="var(--color-primary)" stroke-width="0.8"/>
+          <!-- Wheels -->
+          <circle cx="16" cy="28" r="4" fill="none" stroke="var(--color-primary)" stroke-width="1.5"/>
+          <circle cx="16" cy="28" r="1.5" fill="var(--color-primary)"/>
+          <circle cx="30" cy="28" r="4" fill="none" stroke="var(--color-primary)" stroke-width="1.5"/>
+          <circle cx="30" cy="28" r="1.5" fill="var(--color-primary)"/>
+          <circle cx="44" cy="28" r="3.5" fill="none" stroke="var(--color-accent)" stroke-width="1.5"/>
+          <circle cx="44" cy="28" r="1.2" fill="var(--color-accent)"/>
+          <!-- Cowcatcher -->
+          <path d="M4 24L8 18V24Z" fill="rgba(110,231,255,0.2)" stroke="var(--color-primary)" stroke-width="1"/>
+          <!-- Headlight -->
+          <circle cx="8" cy="12" r="2" fill="var(--color-primary)" opacity="0.8"/>
+          <!-- Star decoration -->
+          <circle cx="22" cy="16" r="1.5" fill="var(--color-accent)" opacity="0.6"/>
+        </svg>
+      </div>
       <div class="train-stations">
         <div class="train-station" onclick="navigateTo('screen-detail-blanc')">
           <div class="train-station-dot" style="border-color: var(--color-blanc);"></div>
@@ -1709,27 +1885,37 @@ body {
   <!-- ===== DEMO: Hospital Reception ===== -->
   <div class="screen" id="screen-demo-reception">
     <div class="demo-screen">
-      <button class="detail-back" onclick="navigateTo('screen-welcome')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        ホームへ戻る
-      </button>
-      <div class="demo-header">
-        <div class="demo-header-badge" style="background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.25); color: var(--color-blanc);">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M9 8h1M9 12h1M9 16h1M14 8h1M14 12h1M14 16h1M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16"/></svg>
-          RECEPTION DEMO
+      <div class="demo-avatar-panel" id="reception-avatar-panel">
+        <div class="demo-avatar-wrap">
+          <div class="demo-avatar-glow"></div>
+          <img class="demo-avatar-img" src="avatars/nurse.png" alt="受付 星野">
         </div>
-        <h2 class="demo-title">銀河鉄道病院<span class="text-blanc"> 受付案内</span></h2>
-        <p class="demo-subtitle">AIアバターが受付で患者様をご案内するデモンストレーションです</p>
+        <div class="demo-avatar-name">星野 あかり</div>
+        <div class="demo-avatar-role">受付担当 AI</div>
       </div>
-      <div class="demo-chat-area" id="reception-chat"></div>
-      <div class="demo-nav">
-        <button class="demo-reset-btn" onclick="startReceptionDemo()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg>
-          最初からやり直す
+      <div class="demo-right-panel">
+        <button class="detail-back" onclick="navigateTo('screen-welcome')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          ホームへ戻る
         </button>
-        <button class="demo-reset-btn" onclick="navigateTo('screen-demo-consulting')">
-          経営コンサルデモへ →
-        </button>
+        <div class="demo-header">
+          <div class="demo-header-badge" style="background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.25); color: var(--color-blanc);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M9 8h1M9 12h1M9 16h1M14 8h1M14 12h1M14 16h1M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16"/></svg>
+            RECEPTION DEMO
+          </div>
+          <h2 class="demo-title">銀河鉄道病院<span class="text-blanc"> 受付案内</span></h2>
+          <p class="demo-subtitle">AIアバターが受付で患者様をご案内します</p>
+        </div>
+        <div class="demo-chat-area" id="reception-chat"></div>
+        <div class="demo-nav">
+          <button class="demo-reset-btn" onclick="startReceptionDemo()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg>
+            最初からやり直す
+          </button>
+          <button class="demo-reset-btn" onclick="navigateTo('screen-demo-consulting')">
+            経営コンサルデモへ →
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -1737,27 +1923,37 @@ body {
   <!-- ===== DEMO: Hospital Consulting ===== -->
   <div class="screen" id="screen-demo-consulting">
     <div class="demo-screen">
-      <button class="detail-back" onclick="navigateTo('screen-welcome')">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        ホームへ戻る
-      </button>
-      <div class="demo-header">
-        <div class="demo-header-badge" style="background: rgba(244,114,182,0.12); border: 1px solid rgba(244,114,182,0.25); color: var(--color-ai);">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
-          CONSULTING DEMO
+      <div class="demo-avatar-panel" id="consulting-avatar-panel">
+        <div class="demo-avatar-wrap">
+          <div class="demo-avatar-glow" style="background: linear-gradient(135deg, rgba(244,114,182,0.3), rgba(251,191,36,0.3));"></div>
+          <img class="demo-avatar-img" src="avatars/consultant.png" alt="コンサルタント">
         </div>
-        <h2 class="demo-title">病院経営<span class="text-ai">コンサルティング</span>AI</h2>
-        <p class="demo-subtitle">地域特性・病床数・人口動態をヒアリングし、最適な病院経営の方向性をご提案します</p>
+        <div class="demo-avatar-name">藤原 ひかる</div>
+        <div class="demo-avatar-role">経営コンサルタント AI</div>
       </div>
-      <div class="demo-chat-area" id="consulting-chat"></div>
-      <div class="demo-nav">
-        <button class="demo-reset-btn" onclick="startConsultingDemo()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg>
-          最初からやり直す
+      <div class="demo-right-panel">
+        <button class="detail-back" onclick="navigateTo('screen-welcome')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          ホームへ戻る
         </button>
-        <button class="demo-reset-btn" onclick="navigateTo('screen-demo-reception')">
-          ← 受付案内デモへ
-        </button>
+        <div class="demo-header">
+          <div class="demo-header-badge" style="background: rgba(244,114,182,0.12); border: 1px solid rgba(244,114,182,0.25); color: var(--color-ai);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+            CONSULTING DEMO
+          </div>
+          <h2 class="demo-title">病院経営<span class="text-ai">コンサルティング</span>AI</h2>
+          <p class="demo-subtitle">地域特性・病床数・人口動態をヒアリングし、最適な方向性をご提案</p>
+        </div>
+        <div class="demo-chat-area" id="consulting-chat"></div>
+        <div class="demo-nav">
+          <button class="demo-reset-btn" onclick="startConsultingDemo()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg>
+            最初からやり直す
+          </button>
+          <button class="demo-reset-btn" onclick="navigateTo('screen-demo-reception')">
+            ← 受付案内デモへ
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -1847,16 +2043,6 @@ const AVATAR_MESSAGES = {
   'screen-detail-consult': '個別にご相談できるコーナーです。何から始めたらいいか分からないという方も、担当者が一緒に整理させていただきます。',
 };
 
-const BOOTH_SPEECHES = [
-  'JBCCブースへようこそ！私がご案内いたします。まずは各コーナーをご紹介しますね。',
-  'こちらは「blanc（ブラン）」。クラウドで使える電子カルテです。紙カルテからの移行をお考えの病院様に多くご導入いただいています。',
-  '精神科・メンタル系に特化した「blanc（精神）」もございます。精神科特有の記録や加算にも対応しています。',
-  'クラウド/セキュリティのコーナーでは、病院のシステム全体のクラウド移行をご支援しています。',
-  'AI活用コーナーでは、Microsoft Copilotをはじめとした生成AIの活用事例を、デモを交えてご紹介しています。',
-  '何から始めたらいいか分からない方は、個別相談コーナーへどうぞ。担当者が丁寧にお話を伺います。',
-  'パートナーのメディカルシステム株式会社は、臨床検査システムや輸血検査システムを展示予定です。',
-  'パートナーの株式会社メディカルフロントは、クラウド型DIシステム「SmartDiX®」などを展示予定です。',
-];
 
 function initStarfield() {
   const container = document.getElementById('starfield');
@@ -1924,7 +2110,8 @@ function navigateTo(screenId) {
   }
 
   const hidePanel = screenId === 'screen-welcome' || screenId === 'screen-booth-intro'
-    || screenId === 'screen-demo-reception' || screenId === 'screen-demo-consulting';
+    || screenId === 'screen-demo-reception' || screenId === 'screen-demo-consulting'
+    || screenId === 'screen-scenario' || screenId.startsWith('screen-detail-');
   const panel = document.getElementById('staff-panel');
   if (hidePanel) {
     panel.classList.remove('visible');
@@ -1957,6 +2144,12 @@ function navigateTo(screenId) {
     startConsultingDemo();
   }
 
+  const loopIdx = AUTO_LOOP_SEQUENCE.findIndex(s => s.screen === screenId);
+  if (loopIdx >= 0) {
+    autoLoopIdx = loopIdx;
+    scheduleNextAutoScreen();
+  }
+
   window.scrollTo(0, 0);
 }
 
@@ -1970,21 +2163,8 @@ function startWelcomeTyping() {
 }
 
 function startBoothIntro() {
-  const el = document.getElementById('booth-speech-text');
   const mouth = document.getElementById('intro-mouth');
-  let idx = 0;
-  function nextSpeech() {
-    if (idx >= BOOTH_SPEECHES.length) {
-      idx = 0;
-    }
-    mouth.classList.add('speaking');
-    typeText(el, BOOTH_SPEECHES[idx], 45, () => {
-      mouth.classList.remove('speaking');
-      idx++;
-      setTimeout(nextSpeech, 3000);
-    });
-  }
-  nextSpeech();
+  if (mouth) mouth.classList.add('speaking');
 }
 
 function updateSlideshow() {
@@ -2009,7 +2189,14 @@ function slideMove(dir) {
 function startSlideAutoPlay() {
   stopSlideAutoPlay();
   slideAutoTimer = setInterval(() => {
-    currentSlide = (currentSlide + 1) % slideCount;
+    currentSlide++;
+    if (currentSlide >= slideCount) {
+      currentSlide = 0;
+      updateSlideshow();
+      stopSlideAutoPlay();
+      setTimeout(() => navigateTo('screen-scenario'), 1000);
+      return;
+    }
     updateSlideshow();
   }, 6000);
 }
@@ -2538,12 +2725,51 @@ function handleDemoOption(btn, container) {
   }
 }
 
+/* ===== AUTO-LOOP (Exhibition Kiosk Mode) ===== */
+let autoLoopTimer = null;
+const AUTO_LOOP_SEQUENCE = [
+  { screen: 'screen-welcome', delay: 10000 },
+  { screen: 'screen-scenario', delay: 8000 },
+  { screen: 'screen-detail-blanc', delay: 7000 },
+  { screen: 'screen-detail-blanc-psy', delay: 7000 },
+  { screen: 'screen-detail-cloud', delay: 7000 },
+  { screen: 'screen-detail-ai', delay: 7000 },
+  { screen: 'screen-detail-consult', delay: 7000 },
+  { screen: 'screen-demo-reception', delay: 15000 },
+  { screen: 'screen-demo-consulting', delay: 15000 },
+];
+let autoLoopIdx = 0;
+
+function startAutoLoop() {
+  clearAutoLoop();
+  autoLoopIdx = 0;
+  scheduleNextAutoScreen();
+}
+
+function clearAutoLoop() {
+  if (autoLoopTimer) { clearTimeout(autoLoopTimer); autoLoopTimer = null; }
+}
+
+function scheduleNextAutoScreen() {
+  clearAutoLoop();
+  const step = AUTO_LOOP_SEQUENCE[autoLoopIdx];
+  if (!step) return;
+  if (step.delay === null) return;
+  autoLoopTimer = setTimeout(() => {
+    autoLoopIdx = (autoLoopIdx + 1) % AUTO_LOOP_SEQUENCE.length;
+    const next = AUTO_LOOP_SEQUENCE[autoLoopIdx];
+    navigateTo(next.screen);
+    scheduleNextAutoScreen();
+  }, step.delay);
+}
+
 function init() {
   initStarfield();
   updateSlideshow();
   startWelcomeTyping();
   setInterval(shootingStar, 4000 + Math.random() * 3000);
   setTimeout(shootingStar, 2000);
+  startAutoLoop();
 }
 
 document.addEventListener('DOMContentLoaded', init);

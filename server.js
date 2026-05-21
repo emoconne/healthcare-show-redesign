@@ -183,6 +183,37 @@ app.post('/api/tts', async (req, res) => {
   }
 });
 
+app.get('/api/speech/token', async (req, res) => {
+  if (!SPEECH_KEY) {
+    return res.status(503).json({ error: 'Azure Speech not configured' });
+  }
+
+  try {
+    const tokenUrl = `https://${SPEECH_REGION}.api.cognitive.microsoft.com/sts/v1.0/issueToken`;
+    const response = await fetch(tokenUrl, {
+      method: 'POST',
+      headers: {
+        'Ocp-Apim-Subscription-Key': SPEECH_KEY,
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': '0'
+      }
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error('Speech token error:', response.status, errText);
+      return res.status(500).json({ error: 'Speech token generation failed' });
+    }
+
+    const token = await response.text();
+    res.set({ 'Cache-Control': 'no-cache' });
+    res.json({ token, region: SPEECH_REGION, expiresIn: 600 });
+  } catch (err) {
+    console.error('Speech token error:', err.message);
+    res.status(500).json({ error: 'Speech token generation failed' });
+  }
+});
+
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',

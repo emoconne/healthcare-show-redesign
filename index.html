@@ -1286,6 +1286,30 @@ body {
 }
 .demo-chat-send:hover { transform: scale(1.1); }
 .demo-chat-send:active { transform: scale(0.95); }
+.demo-chat-mic {
+  width: 42px; height: 42px;
+  border: 1px solid rgba(110, 231, 255, 0.3);
+  border-radius: 50%;
+  background: rgba(17, 24, 39, 0.9);
+  color: var(--color-primary);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s, border-color 0.2s, background 0.2s, color 0.2s;
+}
+.demo-chat-mic:hover { transform: scale(1.06); border-color: var(--color-primary); }
+.demo-chat-mic:active { transform: scale(0.95); }
+.demo-chat-mic.listening {
+  background: rgba(56, 189, 248, 0.18);
+  border-color: rgba(56, 189, 248, 0.9);
+  color: #d6f6ff;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+}
+.demo-chat-mic:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
 .demo-nav {
   display: flex;
   justify-content: center;
@@ -2001,6 +2025,9 @@ body {
         <div class="demo-chat-area" id="reception-chat"></div>
         <div class="demo-chat-input-row">
           <input type="text" class="demo-chat-input" id="reception-input" placeholder="自由に質問してみてください…" onkeydown="if(event.key==='Enter')sendFreeChat('reception')">
+          <button class="demo-chat-mic" id="reception-mic" onclick="toggleVoiceInput('reception')" title="音声入力を開始">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><path d="M12 19v4"/><path d="M8 23h8"/></svg>
+          </button>
           <button class="demo-chat-send" onclick="sendFreeChat('reception')">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
           </button>
@@ -2048,6 +2075,9 @@ body {
         <div class="demo-chat-area" id="consulting-chat"></div>
         <div class="demo-chat-input-row">
           <input type="text" class="demo-chat-input" id="consulting-input" placeholder="経営課題を自由に質問してみてください…" onkeydown="if(event.key==='Enter')sendFreeChat('consulting')">
+          <button class="demo-chat-mic" id="consulting-mic" onclick="toggleVoiceInput('consulting')" title="音声入力を開始">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><path d="M12 19v4"/><path d="M8 23h8"/></svg>
+          </button>
           <button class="demo-chat-send" onclick="sendFreeChat('consulting')">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
           </button>
@@ -3053,6 +3083,135 @@ function init() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+</script>
+
+<script src="https://aka.ms/csspeech/jsbrowserpackageraw"></script>
+<script>
+/* ===== STT (Speech-to-Text) ===== */
+let activeRecognizer = null;
+let activeDemoType = null;
+let speechTokenCache = null;
+let speechTokenExpiryAt = 0;
+
+function getMicButton(demoType) {
+  return document.getElementById(demoType === 'reception' ? 'reception-mic' : 'consulting-mic');
+}
+
+function setMicState(demoType, isListening, disabled = false) {
+  const btn = getMicButton(demoType);
+  if (!btn) return;
+  btn.classList.toggle('listening', isListening);
+  btn.disabled = disabled;
+  btn.title = isListening ? '音声入力を停止' : '音声入力を開始';
+}
+
+async function fetchSpeechToken() {
+  if (speechTokenCache && Date.now() < speechTokenExpiryAt) {
+    return speechTokenCache;
+  }
+
+  const res = await fetch('/api/speech/token');
+  if (!res.ok) throw new Error('speech token unavailable');
+  const tokenInfo = await res.json();
+  const expiresInSec = Number(tokenInfo.expiresIn || 600);
+  speechTokenCache = tokenInfo;
+  speechTokenExpiryAt = Date.now() + Math.max(60, expiresInSec - 60) * 1000;
+  return tokenInfo;
+}
+
+function stopVoiceInput() {
+  if (!activeRecognizer) return;
+
+  const recognizer = activeRecognizer;
+  activeRecognizer = null;
+  activeDemoType = null;
+  setMicState('reception', false, false);
+  setMicState('consulting', false, false);
+
+  recognizer.stopContinuousRecognitionAsync(
+    () => {
+      recognizer.close();
+    },
+    (err) => {
+      console.error('Stop recognition failed:', err);
+      recognizer.close();
+    }
+  );
+}
+
+async function toggleVoiceInput(demoType) {
+  if (activeRecognizer && activeDemoType === demoType) {
+    stopVoiceInput();
+    return;
+  }
+
+  if (!window.SpeechSDK) {
+    alert('音声入力ライブラリの読み込みに失敗しました。ページを再読み込みしてください。');
+    return;
+  }
+
+  if (activeRecognizer && activeDemoType && activeDemoType !== demoType) {
+    stopVoiceInput();
+  }
+
+  setMicState(demoType, false, true);
+
+  try {
+    const tokenInfo = await fetchSpeechToken();
+    const speechConfig = window.SpeechSDK.SpeechConfig.fromAuthorizationToken(tokenInfo.token, tokenInfo.region);
+    speechConfig.speechRecognitionLanguage = 'ja-JP';
+
+    const audioConfig = window.SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
+    const recognizer = new window.SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+
+    activeRecognizer = recognizer;
+    activeDemoType = demoType;
+
+    recognizer.recognized = (s, e) => {
+      if (e.result.reason !== window.SpeechSDK.ResultReason.RecognizedSpeech) return;
+      const spoken = (e.result.text || '').trim();
+      if (!spoken) return;
+
+      const inputId = demoType === 'reception' ? 'reception-input' : 'consulting-input';
+      const input = document.getElementById(inputId);
+      if (input) {
+        input.value = spoken;
+      }
+      sendFreeChat(demoType);
+    };
+
+    recognizer.canceled = (s, e) => {
+      console.error('Speech canceled:', e && e.errorDetails ? e.errorDetails : e);
+      stopVoiceInput();
+    };
+
+    recognizer.sessionStopped = () => {
+      stopVoiceInput();
+    };
+
+    recognizer.startContinuousRecognitionAsync(
+      () => {
+        setMicState(demoType, true, false);
+      },
+      (err) => {
+        console.error('Start recognition failed:', err);
+        stopVoiceInput();
+      }
+    );
+  } catch (err) {
+    console.error('Voice input error:', err);
+    setMicState(demoType, false, false);
+
+    const errMsg = String((err && err.message) || '').toLowerCase();
+    let message = '音声入力を開始できませんでした。';
+    if (errMsg.includes('permission') || errMsg.includes('notallowed') || errMsg.includes('denied')) {
+      message = 'マイク使用が拒否されました。ブラウザ設定でマイク権限を許可してください。';
+    } else if (errMsg.includes('token') || errMsg.includes('speech')) {
+      message = 'Azure Speechの接続設定を確認してください。';
+    }
+    alert(message);
+  }
+}
 </script>
 
 </body>

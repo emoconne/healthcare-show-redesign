@@ -1029,6 +1029,38 @@ body {
   position: relative;
   z-index: 1;
 }
+.demo-avatar-wrap.speaking .demo-avatar-glow {
+  animation: avatarSpeakPulse 0.6s ease-in-out infinite alternate;
+}
+@keyframes avatarSpeakPulse {
+  0% { opacity: 0.5; inset: -4px; }
+  100% { opacity: 1; inset: -8px; filter: brightness(1.3); }
+}
+.demo-avatar-speaking-indicator {
+  position: absolute;
+  bottom: 12px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 4px;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.demo-avatar-wrap.speaking .demo-avatar-speaking-indicator { opacity: 1; }
+.speak-bar {
+  width: 4px;
+  background: var(--color-primary);
+  border-radius: 2px;
+  animation: speakBar 0.4s ease-in-out infinite alternate;
+}
+.speak-bar:nth-child(1) { height: 12px; animation-delay: 0s; }
+.speak-bar:nth-child(2) { height: 18px; animation-delay: 0.1s; }
+.speak-bar:nth-child(3) { height: 10px; animation-delay: 0.2s; }
+.speak-bar:nth-child(4) { height: 16px; animation-delay: 0.15s; }
+.speak-bar:nth-child(5) { height: 8px; animation-delay: 0.05s; }
+@keyframes speakBar {
+  0% { transform: scaleY(0.4); }
+  100% { transform: scaleY(1); }
+}
 .demo-avatar-glow {
   position: absolute; inset: -4px;
   border-radius: calc(var(--radius-lg) + 4px);
@@ -1218,6 +1250,42 @@ body {
   color: var(--color-primary);
   border-color: var(--color-primary);
 }
+.demo-chat-input-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  flex-shrink: 0;
+}
+.demo-chat-input {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  background: rgba(18, 18, 42, 0.8);
+  border: 1px solid rgba(110, 231, 255, 0.2);
+  border-radius: 12px;
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.demo-chat-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 12px rgba(110, 231, 255, 0.15);
+}
+.demo-chat-input::placeholder { color: var(--color-text-dim); }
+.demo-chat-send {
+  width: 42px; height: 42px;
+  border: none;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  color: white;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s, opacity 0.2s;
+}
+.demo-chat-send:hover { transform: scale(1.1); }
+.demo-chat-send:active { transform: scale(0.95); }
 .demo-nav {
   display: flex;
   justify-content: center;
@@ -1226,6 +1294,27 @@ body {
   margin-top: 0.5rem;
   flex-shrink: 0;
 }
+/* Auto-loop indicator */
+.auto-loop-badge {
+  position: fixed;
+  bottom: 1rem; left: 50%;
+  transform: translateX(-50%);
+  padding: 0.4rem 1.2rem;
+  background: var(--color-surface-glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(110, 231, 255, 0.2);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: var(--color-text-dim);
+  z-index: 100;
+  cursor: pointer;
+  transition: opacity 0.3s, background 0.3s;
+}
+.auto-loop-badge.paused {
+  border-color: rgba(251, 191, 36, 0.4);
+  color: var(--color-gold);
+}
+.auto-loop-badge:hover { background: rgba(18, 18, 42, 0.9); }
 
 /* Demo entry cards on welcome */
 .demo-entries {
@@ -1886,9 +1975,12 @@ body {
   <div class="screen" id="screen-demo-reception">
     <div class="demo-screen">
       <div class="demo-avatar-panel" id="reception-avatar-panel">
-        <div class="demo-avatar-wrap">
+        <div class="demo-avatar-wrap" id="reception-avatar-wrap">
           <div class="demo-avatar-glow"></div>
           <img class="demo-avatar-img" src="avatars/nurse.png" alt="受付 星野">
+          <div class="demo-avatar-speaking-indicator">
+            <div class="speak-bar"></div><div class="speak-bar"></div><div class="speak-bar"></div><div class="speak-bar"></div><div class="speak-bar"></div>
+          </div>
         </div>
         <div class="demo-avatar-name">星野 あかり</div>
         <div class="demo-avatar-role">受付担当 AI</div>
@@ -1907,6 +1999,12 @@ body {
           <p class="demo-subtitle">AIアバターが受付で患者様をご案内します</p>
         </div>
         <div class="demo-chat-area" id="reception-chat"></div>
+        <div class="demo-chat-input-row">
+          <input type="text" class="demo-chat-input" id="reception-input" placeholder="自由に質問してみてください…" onkeydown="if(event.key==='Enter')sendFreeChat('reception')">
+          <button class="demo-chat-send" onclick="sendFreeChat('reception')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          </button>
+        </div>
         <div class="demo-nav">
           <button class="demo-reset-btn" onclick="startReceptionDemo()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg>
@@ -1924,9 +2022,12 @@ body {
   <div class="screen" id="screen-demo-consulting">
     <div class="demo-screen">
       <div class="demo-avatar-panel" id="consulting-avatar-panel">
-        <div class="demo-avatar-wrap">
+        <div class="demo-avatar-wrap" id="consulting-avatar-wrap">
           <div class="demo-avatar-glow" style="background: linear-gradient(135deg, rgba(244,114,182,0.3), rgba(251,191,36,0.3));"></div>
           <img class="demo-avatar-img" src="avatars/consultant.png" alt="コンサルタント">
+          <div class="demo-avatar-speaking-indicator">
+            <div class="speak-bar"></div><div class="speak-bar"></div><div class="speak-bar"></div><div class="speak-bar"></div><div class="speak-bar"></div>
+          </div>
         </div>
         <div class="demo-avatar-name">藤原 ひかる</div>
         <div class="demo-avatar-role">経営コンサルタント AI</div>
@@ -1945,6 +2046,12 @@ body {
           <p class="demo-subtitle">地域特性・病床数・人口動態をヒアリングし、最適な方向性をご提案</p>
         </div>
         <div class="demo-chat-area" id="consulting-chat"></div>
+        <div class="demo-chat-input-row">
+          <input type="text" class="demo-chat-input" id="consulting-input" placeholder="経営課題を自由に質問してみてください…" onkeydown="if(event.key==='Enter')sendFreeChat('consulting')">
+          <button class="demo-chat-send" onclick="sendFreeChat('consulting')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          </button>
+        </div>
         <div class="demo-nav">
           <button class="demo-reset-btn" onclick="startConsultingDemo()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg>
@@ -2007,6 +2114,7 @@ body {
 <div class="avatar-speech-float" id="avatar-speech-float" style="display:none;">
   <span id="avatar-speech-float-text"></span>
 </div>
+<div class="auto-loop-badge" id="auto-loop-badge" onclick="toggleAutoLoop()">⟳ 自動巡回中</div>
 
 <script>
 const SCREENS = {};
@@ -2098,7 +2206,7 @@ function typeText(element, text, speed = 40, callback) {
   type();
 }
 
-function navigateTo(screenId) {
+function navigateTo(screenId, isAutoLoop) {
   const prev = document.getElementById(currentScreen);
   if (prev) prev.classList.remove('active');
   currentScreen = screenId;
@@ -2147,7 +2255,7 @@ function navigateTo(screenId) {
   const loopIdx = AUTO_LOOP_SEQUENCE.findIndex(s => s.screen === screenId);
   if (loopIdx >= 0) {
     autoLoopIdx = loopIdx;
-    scheduleNextAutoScreen();
+    if (!autoLoopPaused) scheduleNextAutoScreen();
   }
 
   window.scrollTo(0, 0);
@@ -2315,7 +2423,7 @@ const NURSE_AVATAR = 'avatars/nurse.png';
 const CONSULTANT_AVATAR = 'avatars/consultant.png';
 const USER_ICON_SVG = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
 
-function addChatMsg(container, type, text, avatarSrc, options) {
+function addChatMsg(container, type, text, avatarSrc, options, speakAs) {
   const chatArea = document.getElementById(container);
   const msg = document.createElement('div');
   msg.className = 'chat-msg ' + type;
@@ -2336,6 +2444,10 @@ function addChatMsg(container, type, text, avatarSrc, options) {
   msg.innerHTML = avatarHtml + '<div class="chat-bubble">' + text + optionsHtml + '</div>';
   chatArea.appendChild(msg);
   chatArea.scrollTop = chatArea.scrollHeight;
+  if (type === 'ai') {
+    const demoType = speakAs || (container === 'reception-chat' ? 'reception' : container === 'consulting-chat' ? 'consulting' : null);
+    if (demoType) speakText(text, demoType);
+  }
   return msg;
 }
 
@@ -2725,8 +2837,72 @@ function handleDemoOption(btn, container) {
   }
 }
 
+/* ===== TTS (Text-to-Speech) ===== */
+let currentAudio = null;
+let ttsEnabled = true;
+
+function getAvatarWrap(demoType) {
+  return document.getElementById(demoType === 'reception' ? 'reception-avatar-wrap' : 'consulting-avatar-wrap');
+}
+
+async function speakText(text, demoType) {
+  if (!ttsEnabled) return;
+  stopSpeaking();
+
+  const wrap = getAvatarWrap(demoType);
+  const cleanText = text.replace(/<[^>]*>/g, '').replace(/[🏥✨📊▸]/g, '').trim();
+  if (!cleanText || cleanText.length < 2) return;
+
+  try {
+    const res = await fetch('/api/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: cleanText })
+    });
+    if (!res.ok) return;
+
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    currentAudio = new Audio(url);
+
+    if (wrap) wrap.classList.add('speaking');
+
+    currentAudio.onended = () => {
+      if (wrap) wrap.classList.remove('speaking');
+      URL.revokeObjectURL(url);
+      currentAudio = null;
+    };
+    currentAudio.onerror = () => {
+      if (wrap) wrap.classList.remove('speaking');
+      URL.revokeObjectURL(url);
+      currentAudio = null;
+    };
+
+    await currentAudio.play();
+  } catch (err) {
+    if (wrap) wrap.classList.remove('speaking');
+  }
+}
+
+function stopSpeaking() {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.onended = null;
+    currentAudio.onerror = null;
+    currentAudio = null;
+  }
+  const rWrap = document.getElementById('reception-avatar-wrap');
+  const cWrap = document.getElementById('consulting-avatar-wrap');
+  if (rWrap) rWrap.classList.remove('speaking');
+  if (cWrap) cWrap.classList.remove('speaking');
+}
+
 /* ===== AUTO-LOOP (Exhibition Kiosk Mode) ===== */
 let autoLoopTimer = null;
+let autoLoopPaused = false;
+let idleResumeTimer = null;
+const IDLE_RESUME_DELAY = 60000;
+
 const AUTO_LOOP_SEQUENCE = [
   { screen: 'screen-welcome', delay: 10000 },
   { screen: 'screen-scenario', delay: 8000 },
@@ -2741,8 +2917,9 @@ const AUTO_LOOP_SEQUENCE = [
 let autoLoopIdx = 0;
 
 function startAutoLoop() {
-  clearAutoLoop();
+  autoLoopPaused = false;
   autoLoopIdx = 0;
+  updateLoopBadge();
   scheduleNextAutoScreen();
 }
 
@@ -2750,17 +2927,120 @@ function clearAutoLoop() {
   if (autoLoopTimer) { clearTimeout(autoLoopTimer); autoLoopTimer = null; }
 }
 
+function pauseAutoLoop() {
+  if (autoLoopPaused) return;
+  autoLoopPaused = true;
+  clearAutoLoop();
+  updateLoopBadge();
+  resetIdleResume();
+}
+
+function resumeAutoLoop() {
+  autoLoopPaused = false;
+  clearIdleResume();
+  updateLoopBadge();
+  scheduleNextAutoScreen();
+}
+
+function toggleAutoLoop() {
+  if (autoLoopPaused) { resumeAutoLoop(); } else { pauseAutoLoop(); }
+}
+
+function updateLoopBadge() {
+  const badge = document.getElementById('auto-loop-badge');
+  if (!badge) return;
+  if (autoLoopPaused) {
+    badge.textContent = '⏸ 自動巡回 一時停止中（タップで再開）';
+    badge.classList.add('paused');
+  } else {
+    badge.textContent = '⟳ 自動巡回中';
+    badge.classList.remove('paused');
+  }
+}
+
+function resetIdleResume() {
+  clearIdleResume();
+  idleResumeTimer = setTimeout(() => {
+    resumeAutoLoop();
+  }, IDLE_RESUME_DELAY);
+}
+
+function clearIdleResume() {
+  if (idleResumeTimer) { clearTimeout(idleResumeTimer); idleResumeTimer = null; }
+}
+
+function onUserInteraction() {
+  if (!autoLoopPaused) {
+    pauseAutoLoop();
+  } else {
+    resetIdleResume();
+  }
+}
+
 function scheduleNextAutoScreen() {
   clearAutoLoop();
+  if (autoLoopPaused) return;
   const step = AUTO_LOOP_SEQUENCE[autoLoopIdx];
   if (!step) return;
   if (step.delay === null) return;
   autoLoopTimer = setTimeout(() => {
     autoLoopIdx = (autoLoopIdx + 1) % AUTO_LOOP_SEQUENCE.length;
     const next = AUTO_LOOP_SEQUENCE[autoLoopIdx];
-    navigateTo(next.screen);
+    navigateTo(next.screen, true);
     scheduleNextAutoScreen();
   }, step.delay);
+}
+
+document.addEventListener('click', (e) => {
+  if (e.target.closest('#auto-loop-badge')) return;
+  onUserInteraction();
+}, true);
+document.addEventListener('touchstart', (e) => {
+  if (e.target.closest('#auto-loop-badge')) return;
+  onUserInteraction();
+}, { passive: true, capture: true });
+
+/* ===== OPENAI FREE CHAT ===== */
+const chatHistories = { reception: [], consulting: [] };
+let sessionId = 'session-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+
+async function sendFreeChat(demoType) {
+  const inputId = demoType === 'reception' ? 'reception-input' : 'consulting-input';
+  const chatId = demoType === 'reception' ? 'reception-chat' : 'consulting-chat';
+  const avatar = demoType === 'reception' ? NURSE_AVATAR : CONSULTANT_AVATAR;
+  const input = document.getElementById(inputId);
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  addChatMsg(chatId, 'user', text, null);
+  chatHistories[demoType].push({ role: 'user', content: text });
+
+  showTyping(chatId, avatar);
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: chatHistories[demoType].slice(-10),
+        sessionId,
+        demoType
+      })
+    });
+    hideTyping(chatId);
+
+    if (!res.ok) throw new Error('API error');
+    const data = await res.json();
+    const reply = data.reply || 'すみません、応答を生成できませんでした。';
+    chatHistories[demoType].push({ role: 'assistant', content: reply });
+    addChatMsg(chatId, 'ai', reply, avatar);
+  } catch (err) {
+    hideTyping(chatId);
+    addChatMsg(chatId, 'ai',
+      'ただいまAI応答サービスに接続できません。<br>選択肢からお選びいただくか、しばらくしてからお試しください。',
+      avatar);
+  }
 }
 
 function init() {

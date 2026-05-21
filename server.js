@@ -10,6 +10,9 @@ app.use(express.static(path.join(__dirname), {
   extensions: ['html']
 }));
 
+const SPEECH_KEY = process.env.AZURE_SPEECH_KEY;
+const SPEECH_REGION = process.env.AZURE_SPEECH_REGION || 'japaneast';
+
 const OPENAI_ENDPOINT = process.env.AZURE_OPENAI_ENDPOINT;
 const OPENAI_KEY = process.env.AZURE_OPENAI_KEY;
 const OPENAI_DEPLOYMENT = process.env.AZURE_OPENAI_DEPLOYMENT || 'gpt-4o';
@@ -127,11 +130,65 @@ app.get('/api/logs', async (req, res) => {
   }
 });
 
+app.post('/api/tts', async (req, res) => {
+  if (!SPEECH_KEY) {
+    return res.status(503).json({ error: 'Azure Speech not configured' });
+  }
+
+  const { text, voice = 'ja-JP-NanamiNeural', rate = '+15%' } = req.body;
+  if (!text) {
+    return res.status(400).json({ error: 'text required' });
+  }
+
+  const cleanText = text.replace(/<[^>]*>/g, '').replace(/[🏥✨📊▸]/g, '').trim();
+  if (!cleanText) {
+    return res.status(400).json({ error: 'no speakable text' });
+  }
+
+  const ssml = `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="ja-JP">
+  <voice name="${voice}">
+    <prosody rate="${rate}">${cleanText}</prosody>
+  </voice>
+</speak>`;
+
+  try {
+    const ttsUrl = `https://${SPEECH_REGION}.tts.speech.microsoft.com/cognitiveservices/v1`;
+    const response = await fetch(ttsUrl, {
+      method: 'POST',
+      headers: {
+        'Ocp-Apim-Subscription-Key': SPEECH_KEY,
+        'Content-Type': 'application/ssml+xml',
+        'X-Microsoft-OutputFormat': 'audio-24khz-48kbitrate-mono-mp3',
+        'User-Agent': 'healthcare-show'
+      },
+      body: ssml
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error('TTS error:', response.status, errText);
+      return res.status(500).json({ error: 'TTS generation failed' });
+    }
+
+    const audioBuffer = Buffer.from(await response.arrayBuffer());
+    res.set({
+      'Content-Type': 'audio/mpeg',
+      'Content-Length': audioBuffer.length,
+      'Cache-Control': 'no-cache'
+    });
+    res.send(audioBuffer);
+  } catch (err) {
+    console.error('TTS error:', err.message);
+    res.status(500).json({ error: 'TTS生成に失敗しました' });
+  }
+});
+
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
     openai: !!openaiClient,
     cosmos: !!cosmosContainer,
+    speech: !!SPEECH_KEY,
     timestamp: new Date().toISOString()
   });
 });

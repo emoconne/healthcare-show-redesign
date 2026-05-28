@@ -4,8 +4,8 @@
   "description": "JBCC Healthcare Exhibition - Galaxy Railway",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node --env-file=.env server.js",
+    "dev": "node --env-file=.env server.js"
   },
   "engines": {
     "node": ">=22.0.0"

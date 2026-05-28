@@ -88,7 +88,7 @@ app.post('/api/chat', async (req, res) => {
         { role: 'system', content: systemMessage },
         ...messages
       ],
-      max_tokens: 500,
+      max_completion_tokens: 500,
       temperature: 0.7
     });
 
@@ -315,7 +315,7 @@ ${eventGuide}
         },
         { role: 'user', content: '来場者への挨拶とブース紹介をお願いします。' }
       ],
-      max_tokens: 300,
+      max_completion_tokens: 300,
       temperature: 0.9,
       stream: true
     });
@@ -368,7 +368,7 @@ app.post('/api/menu-chat', async (req, res) => {
     const completion = await openaiClient.chat.completions.create({
       model: OPENAI_DEPLOYMENT,
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
-      max_tokens: 400,
+      max_completion_tokens: 400,
       temperature: 0.7
     });
     const reply = completion.choices[0]?.message?.content || '';
@@ -405,7 +405,7 @@ app.get('/api/menu-greeting-stream', async (req, res) => {
         { role: 'system', content: systemPrompt + '\n\nルール：\n- 100文字程度で簡潔にこのコーナーの特長を紹介\n- 温かく親しみやすいトーンで\n- 毎回少し違う表現にしてください\n- 絵文字は使わないでください' },
         { role: 'user', content: 'このコーナーの特長を100文字程度で紹介してください。' }
       ],
-      max_tokens: 150,
+      max_completion_tokens: 150,
       temperature: 0.9,
       stream: true
     });

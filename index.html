@@ -1626,20 +1626,27 @@ body {
   box-shadow: 0 0 20px rgba(110, 231, 255, 0.15);
   max-width: 100%;
   height: 2.6em;
-  overflow-x: scroll;
-  overflow-y: hidden;
+  overflow: hidden;
   margin-bottom: 0.5rem;
   white-space: nowrap;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
 }
-.welcome-speech-compact::-webkit-scrollbar { display: none; }
 .welcome-speech-compact .speech-typing {
-  display: inline;
+  display: inline-block;
   white-space: nowrap;
+  transition: transform 0.15s linear;
 }
 .welcome-speech-compact .speech-cursor {
+  display: inline-block;
+  width: 2px; height: 1em;
+  background: var(--color-primary);
   vertical-align: middle;
+  margin-left: 2px;
+  animation: cursorBlink 1s step-end infinite;
+}
+.welcome-speech-notice {
+  color: var(--color-text-dim);
+  font-size: 0.75em;
+  margin-left: 2em;
 }
 .welcome-speech-compact::before {
   content: '';
@@ -2788,14 +2795,28 @@ function stopWelcomeLoop() {
   if (welcomeLoopTimer) { clearTimeout(welcomeLoopTimer); welcomeLoopTimer = null; }
 }
 
+const AI_NOTICE = '（このメッセージはAIにより毎回異なった内容が表示されています）';
+
+function tickerScroll(container, el) {
+  const overflow = el.offsetWidth - container.offsetWidth + 20;
+  if (overflow > 0) {
+    el.style.transform = `translateX(-${overflow}px)`;
+  }
+}
+
 async function startWelcomeTyping() {
   stopWelcomeLoop();
+  const container = document.getElementById('welcome-speech-area');
   const el = document.getElementById('welcome-text');
   const mouth = document.getElementById('main-mouth');
   el.textContent = '';
+  el.style.transform = 'translateX(0)';
   mouth.classList.add('speaking');
   welcomeAbortController = new AbortController();
   const signal = welcomeAbortController.signal;
+
+  const cursor = container.querySelector('.speech-cursor');
+  if (cursor) cursor.style.display = '';
 
   try {
     const res = await fetch('/api/welcome-stream', { signal });
@@ -2822,7 +2843,7 @@ async function startWelcomeTyping() {
             const parsed = JSON.parse(payload);
             if (parsed.text) {
               el.textContent += parsed.text;
-              el.scrollLeft = el.scrollWidth;
+              tickerScroll(container, el);
             }
           } catch {}
         }
@@ -2830,17 +2851,26 @@ async function startWelcomeTyping() {
     } else {
       const text = await res.text();
       el.textContent = text;
+      tickerScroll(container, el);
     }
   } catch (err) {
     if (err.name === 'AbortError') return;
     el.textContent = 'こんにちは！JBCCブースへようこそ。銀河鉄道に乗って、病院DXの旅にでかけましょう！';
+    tickerScroll(container, el);
   }
 
+  if (signal.aborted) return;
+
+  const notice = document.createElement('span');
+  notice.className = 'welcome-speech-notice';
+  notice.textContent = AI_NOTICE;
+  el.appendChild(notice);
+  tickerScroll(container, el);
+
+  if (cursor) cursor.style.display = 'none';
   mouth.classList.remove('speaking');
 
-  if (!signal.aborted) {
-    welcomeLoopTimer = setTimeout(() => startWelcomeTyping(), WELCOME_DISPLAY_MS);
-  }
+  welcomeLoopTimer = setTimeout(() => startWelcomeTyping(), WELCOME_DISPLAY_MS);
 }
 
 /* ===== MENU CHAT (inline on welcome screen) ===== */

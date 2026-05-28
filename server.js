@@ -379,6 +379,53 @@ app.post('/api/menu-chat', async (req, res) => {
   }
 });
 
+app.get('/api/menu-greeting-stream', async (req, res) => {
+  const menuType = req.query.menuType;
+  const contentFile = MENU_CONTENT_FILES[menuType];
+  let systemPrompt = 'あなたはJBCCブースのAIアテンドです。';
+  if (contentFile) {
+    try { systemPrompt = fs.readFileSync(path.join(__dirname, contentFile), 'utf-8'); } catch {}
+  }
+
+  if (!openaiClient) {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.end('こちらのコーナーについてご案内いたします。ご興味のある内容をお選びください。');
+    return;
+  }
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
+
+  try {
+    const stream = await openaiClient.chat.completions.create({
+      model: OPENAI_DEPLOYMENT,
+      messages: [
+        { role: 'system', content: systemPrompt + '\n\nルール：\n- 100文字程度で簡潔にこのコーナーの特長を紹介\n- 温かく親しみやすいトーンで\n- 毎回少し違う表現にしてください\n- 絵文字は使わないでください' },
+        { role: 'user', content: 'このコーナーの特長を100文字程度で紹介してください。' }
+      ],
+      max_tokens: 150,
+      temperature: 0.9,
+      stream: true
+    });
+
+    for await (const chunk of stream) {
+      const content = chunk.choices[0]?.delta?.content;
+      if (content) {
+        res.write(`data: ${JSON.stringify({ text: content })}\n\n`);
+      }
+    }
+    res.write('data: [DONE]\n\n');
+    res.end();
+  } catch (err) {
+    console.error('Menu greeting stream error:', err.message);
+    res.write(`data: ${JSON.stringify({ text: 'こちらのコーナーについてご案内いたします。ご興味のある内容をお選びください。' })}\n\n`);
+    res.write('data: [DONE]\n\n');
+    res.end();
+  }
+});
+
 app.get('/api/health', async (req, res) => {
   let voicevoxAvailable = false;
   try {

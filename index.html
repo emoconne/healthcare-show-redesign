@@ -1529,15 +1529,15 @@ body {
 }
 .welcome-train-sl {
   position: absolute;
-  top: 50%; right: 0;
+  top: 50%; left: 0;
   transform: translateY(-50%) scaleX(-1);
   animation: welcomeTrainMove 12s linear infinite;
   z-index: 4;
   filter: drop-shadow(0 0 10px rgba(110, 231, 255, 0.5));
 }
 @keyframes welcomeTrainMove {
-  0% { right: -6%; }
-  100% { right: 102%; }
+  0% { left: -6%; }
+  100% { left: 102%; }
 }
 .welcome-train-sl .train-steam {
   top: -14px; left: 6px;
@@ -1564,9 +1564,12 @@ body {
   align-items: flex-start;
   gap: 1.5rem;
   width: 100%;
+  flex: 1;
+  min-height: 0;
 }
 .welcome-hero-avatar {
   flex-shrink: 0;
+  align-self: center;
 }
 .welcome-hero-avatar .avatar-container {
   width: min(340px, 38vh); height: min(340px, 38vh);

@@ -1614,20 +1614,29 @@ body {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(110, 231, 255, 0.2);
-  border-radius: var(--radius);
-  padding: 0.7rem 1rem;
-  font-size: clamp(1.1rem, 0.9rem + 0.7vw, 1.4rem);
-  line-height: 1.6;
+  border-radius: 8px;
+  padding: 0.4rem 1rem;
+  font-size: clamp(0.85rem, 0.7rem + 0.5vw, 1rem);
+  line-height: 1.8;
   text-align: left;
   box-shadow: 0 0 20px rgba(110, 231, 255, 0.15);
   max-width: 100%;
-  max-height: 5.5em;
-  overflow-y: auto;
+  height: 2.6em;
+  overflow-x: scroll;
+  overflow-y: hidden;
   margin-bottom: 0.5rem;
+  white-space: nowrap;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-.welcome-speech-compact::-webkit-scrollbar { width: 3px; }
-.welcome-speech-compact::-webkit-scrollbar-track { background: transparent; }
-.welcome-speech-compact::-webkit-scrollbar-thumb { background: rgba(110, 231, 255, 0.2); border-radius: 2px; }
+.welcome-speech-compact::-webkit-scrollbar { display: none; }
+.welcome-speech-compact .speech-typing {
+  display: inline;
+  white-space: nowrap;
+}
+.welcome-speech-compact .speech-cursor {
+  vertical-align: middle;
+}
 .welcome-speech-compact::before {
   content: '';
   position: absolute;
@@ -2615,6 +2624,7 @@ body {
   <span id="avatar-speech-float-text"></span>
 </div>
 <div class="auto-loop-badge" id="auto-loop-badge" onclick="toggleAutoLoop()" style="display:none;">⟳ 自動巡回中</div>
+<div id="voicevox-credit" style="position:fixed; bottom:0.5rem; left:0.5rem; font-size:0.6rem; color:rgba(232,232,240,0.3); z-index:100; pointer-events:none;">VOICEVOX:ずんだもん</div>
 
 <script>
 const SCREENS = {};
@@ -2806,7 +2816,7 @@ async function startWelcomeTyping() {
             const parsed = JSON.parse(payload);
             if (parsed.text) {
               el.textContent += parsed.text;
-              el.scrollTop = el.scrollHeight;
+              el.scrollLeft = el.scrollWidth;
             }
           } catch {}
         }
@@ -3808,6 +3818,8 @@ function stopVoiceInput() {
 }
 
 async function toggleVoiceInput(demoType) {
+  stopSpeaking();
+
   if (activeRecognizer && activeDemoType === demoType) {
     stopVoiceInput();
     return;

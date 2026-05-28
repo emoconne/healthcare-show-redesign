@@ -14,6 +14,10 @@ app.use(express.static(path.join(__dirname), {
 const SPEECH_KEY = process.env.AZURE_SPEECH_KEY;
 const SPEECH_REGION = process.env.AZURE_SPEECH_REGION || 'japaneast';
 
+const TTS_ENGINE = process.env.TTS_ENGINE || 'azure';
+const VOICEVOX_URL = process.env.VOICEVOX_URL || 'http://localhost:50021';
+const VOICEVOX_SPEAKER = parseInt(process.env.VOICEVOX_SPEAKER || '3');
+
 const OPENAI_ENDPOINT = process.env.AZURE_OPENAI_ENDPOINT;
 const OPENAI_KEY = process.env.AZURE_OPENAI_KEY;
 const OPENAI_DEPLOYMENT = process.env.AZURE_OPENAI_DEPLOYMENT || 'gpt-4o';
@@ -131,11 +135,79 @@ app.get('/api/logs', async (req, res) => {
   }
 });
 
-app.post('/api/tts', async (req, res) => {
-  if (!SPEECH_KEY) {
-    return res.status(503).json({ error: 'Azure Speech not configured' });
+async function synthesizeWithVoicevox(cleanText, res) {
+  const queryRes = await fetch(
+    `${VOICEVOX_URL}/audio_query?text=${encodeURIComponent(cleanText)}&speaker=${VOICEVOX_SPEAKER}`,
+    { method: 'POST' }
+  );
+  if (!queryRes.ok) {
+    const errText = await queryRes.text();
+    throw new Error(`VOICEVOX audio_query failed: ${queryRes.status} ${errText}`);
   }
 
+  const audioQuery = await queryRes.json();
+  audioQuery.speedScale = 1.15;
+
+  const synthRes = await fetch(
+    `${VOICEVOX_URL}/synthesis?speaker=${VOICEVOX_SPEAKER}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(audioQuery)
+    }
+  );
+  if (!synthRes.ok) {
+    const errText = await synthRes.text();
+    throw new Error(`VOICEVOX synthesis failed: ${synthRes.status} ${errText}`);
+  }
+
+  const audioBuffer = Buffer.from(await synthRes.arrayBuffer());
+  res.set({
+    'Content-Type': 'audio/wav',
+    'Content-Length': audioBuffer.length,
+    'Cache-Control': 'no-cache'
+  });
+  res.send(audioBuffer);
+}
+
+async function synthesizeWithAzure(cleanText, voice, rate, res) {
+  if (!SPEECH_KEY) {
+    throw new Error('Azure Speech not configured');
+  }
+
+  const ssml = `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="ja-JP">
+  <voice name="${voice}">
+    <prosody rate="${rate}">${cleanText}</prosody>
+  </voice>
+</speak>`;
+
+  const ttsUrl = `https://${SPEECH_REGION}.tts.speech.microsoft.com/cognitiveservices/v1`;
+  const response = await fetch(ttsUrl, {
+    method: 'POST',
+    headers: {
+      'Ocp-Apim-Subscription-Key': SPEECH_KEY,
+      'Content-Type': 'application/ssml+xml',
+      'X-Microsoft-OutputFormat': 'audio-24khz-48kbitrate-mono-mp3',
+      'User-Agent': 'healthcare-show'
+    },
+    body: ssml
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Azure TTS failed: ${response.status} ${errText}`);
+  }
+
+  const audioBuffer = Buffer.from(await response.arrayBuffer());
+  res.set({
+    'Content-Type': 'audio/mpeg',
+    'Content-Length': audioBuffer.length,
+    'Cache-Control': 'no-cache'
+  });
+  res.send(audioBuffer);
+}
+
+app.post('/api/tts', async (req, res) => {
   const { text, voice = 'ja-JP-NanamiNeural', rate = '+15%' } = req.body;
   if (!text) {
     return res.status(400).json({ error: 'text required' });
@@ -146,38 +218,26 @@ app.post('/api/tts', async (req, res) => {
     return res.status(400).json({ error: 'no speakable text' });
   }
 
-  const ssml = `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="ja-JP">
-  <voice name="${voice}">
-    <prosody rate="${rate}">${cleanText}</prosody>
-  </voice>
-</speak>`;
+  if (TTS_ENGINE === 'voicevox') {
+    try {
+      await synthesizeWithVoicevox(cleanText, res);
+      return;
+    } catch (err) {
+      console.error('VOICEVOX TTS error:', err.message);
+      if (SPEECH_KEY) {
+        console.log('Falling back to Azure TTS...');
+      } else {
+        return res.status(500).json({ error: 'VOICEVOX TTS failed and Azure Speech not configured' });
+      }
+    }
+  }
+
+  if (!SPEECH_KEY) {
+    return res.status(503).json({ error: 'Azure Speech not configured' });
+  }
 
   try {
-    const ttsUrl = `https://${SPEECH_REGION}.tts.speech.microsoft.com/cognitiveservices/v1`;
-    const response = await fetch(ttsUrl, {
-      method: 'POST',
-      headers: {
-        'Ocp-Apim-Subscription-Key': SPEECH_KEY,
-        'Content-Type': 'application/ssml+xml',
-        'X-Microsoft-OutputFormat': 'audio-24khz-48kbitrate-mono-mp3',
-        'User-Agent': 'healthcare-show'
-      },
-      body: ssml
-    });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error('TTS error:', response.status, errText);
-      return res.status(500).json({ error: 'TTS generation failed' });
-    }
-
-    const audioBuffer = Buffer.from(await response.arrayBuffer());
-    res.set({
-      'Content-Type': 'audio/mpeg',
-      'Content-Length': audioBuffer.length,
-      'Cache-Control': 'no-cache'
-    });
-    res.send(audioBuffer);
+    await synthesizeWithAzure(cleanText, voice, rate, res);
   } catch (err) {
     console.error('TTS error:', err.message);
     res.status(500).json({ error: 'TTS生成に失敗しました' });
@@ -319,12 +379,22 @@ app.post('/api/menu-chat', async (req, res) => {
   }
 });
 
-app.get('/api/health', (req, res) => {
+app.get('/api/health', async (req, res) => {
+  let voicevoxAvailable = false;
+  try {
+    const vvRes = await fetch(`${VOICEVOX_URL}/version`, { signal: AbortSignal.timeout(2000) });
+    voicevoxAvailable = vvRes.ok;
+  } catch (_) {
+    voicevoxAvailable = false;
+  }
+
   res.json({
     status: 'ok',
     openai: !!openaiClient,
     cosmos: !!cosmosContainer,
     speech: !!SPEECH_KEY,
+    voicevox: voicevoxAvailable,
+    ttsEngine: TTS_ENGINE,
     timestamp: new Date().toISOString()
   });
 });

@@ -218,7 +218,7 @@ app.get('/api/speech/token', async (req, res) => {
 app.get('/api/welcome-stream', async (req, res) => {
   if (!openaiClient) {
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-    res.end('こんにちは！JBCCブースへようこそ。銀河鉄道に乗って、病院DXの旅にでかけましょう！');
+    res.end('クラウド電子カルテ「blanc」やAI活用、クラウド移行など、病院DXを総合的にご案内しております。各コーナーをお気軽にご覧ください。');
     return;
   }
 
@@ -240,21 +240,23 @@ app.get('/api/welcome-stream', async (req, res) => {
       messages: [
         {
           role: 'system',
-          content: `あなたはJBCCブースのAIアテンド「J-ポッポ」です。ホスピタルショウ2026の来場者に向けて、ブースの魅力を簡潔に紹介する挨拶を生成してください。
+          content: `あなたはJBCCブースのAIアテンド「J-ポッポ」です。ホスピタルショウ2026の来場者に向けて、このブースの特長を紹介してください。
 
 以下のブース情報を参考にしてください：
 ${eventGuide}
 
 ルール：
-- 2〜3文で簡潔に（80文字以内が理想）
+- 200文字程度で、ブースの見どころや特長を紹介
+- 「こんにちは」等の挨拶は不要（既にフロントで表示済み）
 - 温かく親しみやすいトーンで
 - 毎回少し違う表現にしてバリエーションを持たせてください
 - 来場者が興味を持つようなフレーズを入れてください
-- 絵文字は使わないでください`
+- 絵文字は使わないでください
+- 改行は入れずに自然な文章で`
         },
-        { role: 'user', content: '来場者への挨拶をお願いします。' }
+        { role: 'user', content: 'このブースの見どころを紹介してください。' }
       ],
-      max_tokens: 150,
+      max_tokens: 300,
       temperature: 0.9,
       stream: true
     });
@@ -269,7 +271,7 @@ ${eventGuide}
     res.end();
   } catch (err) {
     console.error('Welcome stream error:', err.message);
-    res.write(`data: ${JSON.stringify({ text: 'こんにちは！JBCCブースへようこそ。銀河鉄道に乗って、病院DXの旅にでかけましょう！' })}\n\n`);
+    res.write(`data: ${JSON.stringify({ text: 'クラウド電子カルテ「blanc」やAI活用、クラウド移行など、病院DXを総合的にご案内しております。各コーナーをお気軽にご覧ください。' })}\n\n`);
     res.write('data: [DONE]\n\n');
     res.end();
   }

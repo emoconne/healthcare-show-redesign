@@ -1477,7 +1477,7 @@ body {
   width: 100%;
   max-width: 1400px;
   height: 64px;
-  margin-bottom: 0.5rem;
+  margin-top: auto;
   flex-shrink: 0;
 }
 .welcome-train-track {
@@ -1529,15 +1529,15 @@ body {
 }
 .welcome-train-sl {
   position: absolute;
-  top: 50%; left: 0;
-  transform: translateY(-50%);
+  top: 50%; right: 0;
+  transform: translateY(-50%) scaleX(-1);
   animation: welcomeTrainMove 12s linear infinite;
   z-index: 4;
   filter: drop-shadow(0 0 10px rgba(110, 231, 255, 0.5));
 }
 @keyframes welcomeTrainMove {
-  0% { left: -6%; }
-  100% { left: 102%; }
+  0% { right: -6%; }
+  100% { right: 102%; }
 }
 .welcome-train-sl .train-steam {
   top: -14px; left: 6px;
@@ -1780,55 +1780,6 @@ body {
 
   <!-- ===== SCREEN 1: WELCOME ===== -->
   <div class="screen active" id="screen-welcome">
-    <!-- Train Track Header -->
-    <div class="welcome-train-header fade-in">
-      <div class="welcome-train-track"></div>
-      <div class="welcome-train-sl">
-        <div class="train-steam">
-          <div class="train-steam-puff"></div>
-          <div class="train-steam-puff"></div>
-          <div class="train-steam-puff"></div>
-        </div>
-        <svg width="44" height="26" viewBox="0 0 56 32" fill="none">
-          <rect x="8" y="8" width="28" height="16" rx="4" fill="rgba(110,231,255,0.15)" stroke="var(--color-primary)" stroke-width="1.5"/>
-          <rect x="12" y="2" width="6" height="8" rx="1" fill="rgba(110,231,255,0.2)" stroke="var(--color-primary)" stroke-width="1"/>
-          <rect x="36" y="4" width="14" height="20" rx="2" fill="rgba(192,132,252,0.15)" stroke="var(--color-accent)" stroke-width="1.5"/>
-          <rect x="39" y="7" width="8" height="6" rx="1" fill="rgba(110,231,255,0.3)" stroke="var(--color-primary)" stroke-width="0.8"/>
-          <circle cx="16" cy="28" r="4" fill="none" stroke="var(--color-primary)" stroke-width="1.5"/>
-          <circle cx="16" cy="28" r="1.5" fill="var(--color-primary)"/>
-          <circle cx="30" cy="28" r="4" fill="none" stroke="var(--color-primary)" stroke-width="1.5"/>
-          <circle cx="30" cy="28" r="1.5" fill="var(--color-primary)"/>
-          <circle cx="44" cy="28" r="3.5" fill="none" stroke="var(--color-accent)" stroke-width="1.5"/>
-          <circle cx="44" cy="28" r="1.2" fill="var(--color-accent)"/>
-          <path d="M4 24L8 18V24Z" fill="rgba(110,231,255,0.2)" stroke="var(--color-primary)" stroke-width="1"/>
-          <circle cx="8" cy="12" r="2" fill="var(--color-primary)" opacity="0.8"/>
-          <circle cx="22" cy="16" r="1.5" fill="var(--color-accent)" opacity="0.6"/>
-        </svg>
-      </div>
-      <div class="welcome-train-stations">
-        <div class="welcome-train-station">
-          <div class="welcome-train-station-dot" style="border-color: var(--color-blanc);"></div>
-          <span class="welcome-train-station-name text-blanc">blanc駅</span>
-        </div>
-        <div class="welcome-train-station">
-          <div class="welcome-train-station-dot" style="border-color: var(--color-cloud);"></div>
-          <span class="welcome-train-station-name text-cloud">精神科駅</span>
-        </div>
-        <div class="welcome-train-station">
-          <div class="welcome-train-station-dot" style="border-color: var(--color-cloud);"></div>
-          <span class="welcome-train-station-name text-cloud">クラウド駅</span>
-        </div>
-        <div class="welcome-train-station">
-          <div class="welcome-train-station-dot" style="border-color: var(--color-ai);"></div>
-          <span class="welcome-train-station-name text-ai">AI駅</span>
-        </div>
-        <div class="welcome-train-station">
-          <div class="welcome-train-station-dot" style="border-color: var(--color-consult);"></div>
-          <span class="welcome-train-station-name text-consult">相談駅</span>
-        </div>
-      </div>
-    </div>
-
     <div class="welcome-layout">
       <!-- Hero: Avatar left + Right column (title + speech + menu) -->
       <div class="welcome-hero-compact fade-in delay-1">
@@ -1974,6 +1925,55 @@ body {
         <button class="demo-reset-btn" onclick="navigateTo('screen-demo-consulting')">
           経営コンサルデモへ →
         </button>
+      </div>
+
+      <!-- Train Track Footer -->
+      <div class="welcome-train-header fade-in">
+        <div class="welcome-train-track"></div>
+        <div class="welcome-train-sl">
+          <div class="train-steam">
+            <div class="train-steam-puff"></div>
+            <div class="train-steam-puff"></div>
+            <div class="train-steam-puff"></div>
+          </div>
+          <svg width="44" height="26" viewBox="0 0 56 32" fill="none">
+            <rect x="8" y="8" width="28" height="16" rx="4" fill="rgba(110,231,255,0.15)" stroke="var(--color-primary)" stroke-width="1.5"/>
+            <rect x="12" y="2" width="6" height="8" rx="1" fill="rgba(110,231,255,0.2)" stroke="var(--color-primary)" stroke-width="1"/>
+            <rect x="36" y="4" width="14" height="20" rx="2" fill="rgba(192,132,252,0.15)" stroke="var(--color-accent)" stroke-width="1.5"/>
+            <rect x="39" y="7" width="8" height="6" rx="1" fill="rgba(110,231,255,0.3)" stroke="var(--color-primary)" stroke-width="0.8"/>
+            <circle cx="16" cy="28" r="4" fill="none" stroke="var(--color-primary)" stroke-width="1.5"/>
+            <circle cx="16" cy="28" r="1.5" fill="var(--color-primary)"/>
+            <circle cx="30" cy="28" r="4" fill="none" stroke="var(--color-primary)" stroke-width="1.5"/>
+            <circle cx="30" cy="28" r="1.5" fill="var(--color-primary)"/>
+            <circle cx="44" cy="28" r="3.5" fill="none" stroke="var(--color-accent)" stroke-width="1.5"/>
+            <circle cx="44" cy="28" r="1.2" fill="var(--color-accent)"/>
+            <path d="M4 24L8 18V24Z" fill="rgba(110,231,255,0.2)" stroke="var(--color-primary)" stroke-width="1"/>
+            <circle cx="8" cy="12" r="2" fill="var(--color-primary)" opacity="0.8"/>
+            <circle cx="22" cy="16" r="1.5" fill="var(--color-accent)" opacity="0.6"/>
+          </svg>
+        </div>
+        <div class="welcome-train-stations">
+          <div class="welcome-train-station">
+            <div class="welcome-train-station-dot" style="border-color: var(--color-blanc);"></div>
+            <span class="welcome-train-station-name text-blanc">blanc駅</span>
+          </div>
+          <div class="welcome-train-station">
+            <div class="welcome-train-station-dot" style="border-color: var(--color-cloud);"></div>
+            <span class="welcome-train-station-name text-cloud">精神科駅</span>
+          </div>
+          <div class="welcome-train-station">
+            <div class="welcome-train-station-dot" style="border-color: var(--color-cloud);"></div>
+            <span class="welcome-train-station-name text-cloud">クラウド駅</span>
+          </div>
+          <div class="welcome-train-station">
+            <div class="welcome-train-station-dot" style="border-color: var(--color-ai);"></div>
+            <span class="welcome-train-station-name text-ai">AI駅</span>
+          </div>
+          <div class="welcome-train-station">
+            <div class="welcome-train-station-dot" style="border-color: var(--color-consult);"></div>
+            <span class="welcome-train-station-name text-consult">相談駅</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>

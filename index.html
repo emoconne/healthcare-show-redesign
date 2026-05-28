@@ -1569,7 +1569,7 @@ body {
   flex-shrink: 0;
 }
 .welcome-hero-avatar .avatar-container {
-  width: min(240px, 28vh); height: min(240px, 28vh);
+  width: min(340px, 38vh); height: min(340px, 38vh);
 }
 .welcome-hero-right {
   flex: 1;
@@ -1611,9 +1611,9 @@ body {
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(110, 231, 255, 0.2);
   border-radius: var(--radius);
-  padding: 0.5rem 0.8rem;
-  font-size: clamp(0.8rem, 0.6rem + 0.5vw, 0.95rem);
-  line-height: 1.5;
+  padding: 0.7rem 1rem;
+  font-size: clamp(1.1rem, 0.9rem + 0.7vw, 1.4rem);
+  line-height: 1.6;
   text-align: left;
   box-shadow: 0 0 20px rgba(110, 231, 255, 0.15);
   max-width: 100%;
@@ -2739,13 +2739,62 @@ function navigateTo(screenId, isAutoLoop) {
   window.scrollTo(0, 0);
 }
 
-function startWelcomeTyping() {
+let welcomeAbortController = null;
+
+async function startWelcomeTyping() {
   const el = document.getElementById('welcome-text');
   const mouth = document.getElementById('main-mouth');
+  el.textContent = '';
   mouth.classList.add('speaking');
-  typeText(el, 'こんにちは！JBCCブースへようこそ。銀河鉄道に乗って、病院DXの旅にでかけましょう！', 50, () => {
-    mouth.classList.remove('speaking');
-  });
+
+  if (welcomeAbortController) {
+    welcomeAbortController.abort();
+  }
+  welcomeAbortController = new AbortController();
+
+  try {
+    const res = await fetch('/api/welcome-stream', { signal: welcomeAbortController.signal });
+    if (!res.ok) throw new Error('stream failed');
+
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('text/event-stream')) {
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const payload = line.slice(6);
+          if (payload === '[DONE]') break;
+          try {
+            const parsed = JSON.parse(payload);
+            if (parsed.text) {
+              el.textContent += parsed.text;
+            }
+          } catch {}
+        }
+      }
+    } else {
+      const text = await res.text();
+      typeText(el, text, 50, () => { mouth.classList.remove('speaking'); });
+      return;
+    }
+  } catch (err) {
+    if (err.name === 'AbortError') return;
+    el.textContent = '';
+    typeText(el, 'こんにちは！JBCCブースへようこそ。銀河鉄道に乗って、病院DXの旅にでかけましょう！', 50, () => {
+      mouth.classList.remove('speaking');
+    });
+    return;
+  }
+
+  mouth.classList.remove('speaking');
 }
 
 function startBoothIntro() {

@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const { CosmosClient } = require('@azure/cosmos');
 const { AzureOpenAI } = require('openai');
 
@@ -211,6 +212,66 @@ app.get('/api/speech/token', async (req, res) => {
   } catch (err) {
     console.error('Speech token error:', err.message);
     res.status(500).json({ error: 'Speech token generation failed' });
+  }
+});
+
+app.get('/api/welcome-stream', async (req, res) => {
+  if (!openaiClient) {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.end('こんにちは！JBCCブースへようこそ。銀河鉄道に乗って、病院DXの旅にでかけましょう！');
+    return;
+  }
+
+  let eventGuide = '';
+  try {
+    eventGuide = fs.readFileSync(path.join(__dirname, 'event-guide.md'), 'utf-8');
+  } catch (e) {
+    eventGuide = 'JBCCホスピタルショウ2026ブース。電子カルテblancやAI活用、クラウド移行などをご案内。';
+  }
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
+
+  try {
+    const stream = await openaiClient.chat.completions.create({
+      model: OPENAI_DEPLOYMENT,
+      messages: [
+        {
+          role: 'system',
+          content: `あなたはJBCCブースのAIアテンド「J-ポッポ」です。ホスピタルショウ2026の来場者に向けて、ブースの魅力を簡潔に紹介する挨拶を生成してください。
+
+以下のブース情報を参考にしてください：
+${eventGuide}
+
+ルール：
+- 2〜3文で簡潔に（80文字以内が理想）
+- 温かく親しみやすいトーンで
+- 毎回少し違う表現にしてバリエーションを持たせてください
+- 来場者が興味を持つようなフレーズを入れてください
+- 絵文字は使わないでください`
+        },
+        { role: 'user', content: '来場者への挨拶をお願いします。' }
+      ],
+      max_tokens: 150,
+      temperature: 0.9,
+      stream: true
+    });
+
+    for await (const chunk of stream) {
+      const content = chunk.choices[0]?.delta?.content;
+      if (content) {
+        res.write(`data: ${JSON.stringify({ text: content })}\n\n`);
+      }
+    }
+    res.write('data: [DONE]\n\n');
+    res.end();
+  } catch (err) {
+    console.error('Welcome stream error:', err.message);
+    res.write(`data: ${JSON.stringify({ text: 'こんにちは！JBCCブースへようこそ。銀河鉄道に乗って、病院DXの旅にでかけましょう！' })}\n\n`);
+    res.write('data: [DONE]\n\n');
+    res.end();
   }
 });
 

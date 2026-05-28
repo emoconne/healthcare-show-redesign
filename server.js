@@ -218,7 +218,7 @@ app.get('/api/speech/token', async (req, res) => {
 app.get('/api/welcome-stream', async (req, res) => {
   if (!openaiClient) {
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-    res.end('クラウド電子カルテ「blanc」やAI活用、クラウド移行など、病院DXを総合的にご案内しております。各コーナーをお気軽にご覧ください。');
+    res.end('こんにちは！JBCCブースへようこそ。銀河鉄道に乗って、病院DXの旅にでかけましょう！クラウド電子カルテ「blanc」やAI活用、クラウド移行など、病院DXを総合的にご案内しております。各コーナーをお気軽にご覧ください。');
     return;
   }
 
@@ -240,21 +240,20 @@ app.get('/api/welcome-stream', async (req, res) => {
       messages: [
         {
           role: 'system',
-          content: `あなたはJBCCブースのAIアテンド「J-ポッポ」です。ホスピタルショウ2026の来場者に向けて、このブースの特長を紹介してください。
+          content: `あなたはJBCCブースのAIアテンド「J-ポッポ」です。ホスピタルショウ2026の来場者に向けて挨拶し、このブースの特長を紹介してください。
 
 以下のブース情報を参考にしてください：
 ${eventGuide}
 
 ルール：
-- 200文字程度で、ブースの見どころや特長を紹介
-- 「こんにちは」等の挨拶は不要（既にフロントで表示済み）
+- 必ず「こんにちは！JBCCブースへようこそ。銀河鉄道に乗って、病院DXの旅にでかけましょう！」から始めてください
+- その後に200文字程度で、ブースの見どころや特長を紹介
 - 温かく親しみやすいトーンで
 - 毎回少し違う表現にしてバリエーションを持たせてください
 - 来場者が興味を持つようなフレーズを入れてください
-- 絵文字は使わないでください
-- 改行は入れずに自然な文章で`
+- 絵文字は使わないでください`
         },
-        { role: 'user', content: 'このブースの見どころを紹介してください。' }
+        { role: 'user', content: '来場者への挨拶とブース紹介をお願いします。' }
       ],
       max_tokens: 300,
       temperature: 0.9,
@@ -271,9 +270,52 @@ ${eventGuide}
     res.end();
   } catch (err) {
     console.error('Welcome stream error:', err.message);
-    res.write(`data: ${JSON.stringify({ text: 'クラウド電子カルテ「blanc」やAI活用、クラウド移行など、病院DXを総合的にご案内しております。各コーナーをお気軽にご覧ください。' })}\n\n`);
+    res.write(`data: ${JSON.stringify({ text: 'こんにちは！JBCCブースへようこそ。銀河鉄道に乗って、病院DXの旅にでかけましょう！クラウド電子カルテ「blanc」やAI活用、クラウド移行など、病院DXを総合的にご案内しております。各コーナーをお気軽にご覧ください。' })}\n\n`);
     res.write('data: [DONE]\n\n');
     res.end();
+  }
+});
+
+const MENU_CONTENT_FILES = {
+  'blanc-general': 'content/blanc-general.md',
+  'blanc-psychiatric': 'content/blanc-psychiatric.md',
+  'dx-ai': 'content/dx-ai.md',
+  'cloud-migration': 'content/cloud-migration.md',
+  'lab-system': 'content/lab-system.md',
+  'security': 'content/security.md',
+  'consultation': 'content/consultation.md'
+};
+
+app.post('/api/menu-chat', async (req, res) => {
+  const { messages, menuType, sessionId } = req.body;
+  if (!messages || !Array.isArray(messages)) {
+    return res.status(400).json({ error: 'messages array required' });
+  }
+
+  const contentFile = MENU_CONTENT_FILES[menuType];
+  let systemPrompt = 'あなたはJBCCブースのAIアテンドです。来場者の質問に丁寧に回答してください。';
+  if (contentFile) {
+    try {
+      systemPrompt = fs.readFileSync(path.join(__dirname, contentFile), 'utf-8');
+    } catch (e) {}
+  }
+
+  if (!openaiClient) {
+    return res.json({ reply: 'こちらのコーナーについてご案内いたします。詳しくはブースの担当者にお声がけください。' });
+  }
+
+  try {
+    const completion = await openaiClient.chat.completions.create({
+      model: OPENAI_DEPLOYMENT,
+      messages: [{ role: 'system', content: systemPrompt }, ...messages],
+      max_tokens: 400,
+      temperature: 0.7
+    });
+    const reply = completion.choices[0]?.message?.content || '';
+    res.json({ reply });
+  } catch (err) {
+    console.error('Menu chat error:', err.message);
+    res.status(500).json({ error: 'AI応答の生成に失敗しました' });
   }
 });
 

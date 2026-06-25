@@ -167,6 +167,33 @@ body {
   width: min(280px, 35vh); height: min(280px, 35vh);
   margin: 0 auto;
 }
+.avatar-video-wrap {
+  position: absolute;
+  inset: 14px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 50% 60%, rgba(110,150,255,.18), rgba(7,13,40,.6) 70%);
+}
+.avatar-video {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  display: block;
+}
+.avatar-video-glow {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 100%, rgba(110,231,255,.22), transparent 65%);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
+#main-avatar.speaking .avatar-video-glow { opacity: 1; animation: avatarSpeakGlow 0.5s ease-in-out infinite alternate; }
+@keyframes avatarSpeakGlow {
+  from { box-shadow: 0 0 0 0 rgba(110,231,255,0); }
+  to   { box-shadow: 0 0 28px 6px rgba(110,231,255,0.45); }
+}
 .avatar-ring {
   position: absolute; inset: 0;
   border-radius: 50%;
@@ -1838,16 +1865,13 @@ body {
           <div class="avatar-container" id="main-avatar">
             <div class="avatar-ring"></div>
             <div class="avatar-ring-2"></div>
-            <div class="avatar-body">
-              <div class="avatar-face">
-                <div class="avatar-antenna"></div>
-                <div class="avatar-eyes">
-                  <div class="avatar-eye"></div>
-                  <div class="avatar-eye"></div>
-                </div>
-                <div class="avatar-mouth" id="main-mouth"></div>
-              </div>
+            <div class="avatar-video-wrap">
+              <video class="avatar-video" autoplay loop muted playsinline>
+                <source src="avatar.mp4" type="video/mp4">
+              </video>
+              <div class="avatar-video-glow"></div>
             </div>
+            <div id="main-mouth" style="display:none;"></div>
           </div>
           <div style="text-align:center; margin-top:0.5rem;">
             <span style="background: var(--color-surface-glass); border: 1px solid rgba(110,231,255,0.2); border-radius: 8px; padding: 0.3rem 0.8rem; font-size: 0.9rem; font-weight: 700; color: var(--color-primary);">J-ポッポ</span>
@@ -2809,9 +2833,11 @@ async function startWelcomeTyping() {
   const container = document.getElementById('welcome-speech-area');
   const el = document.getElementById('welcome-text');
   const mouth = document.getElementById('main-mouth');
+  const mainAvatar = document.getElementById('main-avatar');
   el.textContent = '';
   el.style.transform = 'translateX(0)';
   mouth.classList.add('speaking');
+  if (mainAvatar) mainAvatar.classList.add('speaking');
   welcomeAbortController = new AbortController();
   const signal = welcomeAbortController.signal;
 
@@ -2868,6 +2894,7 @@ async function startWelcomeTyping() {
 
   if (cursor) cursor.style.display = 'none';
   mouth.classList.remove('speaking');
+  if (mainAvatar) mainAvatar.classList.remove('speaking');
 
   await new Promise(r => setTimeout(r, 10000));
   if (signal.aborted) return;

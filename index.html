@@ -1633,7 +1633,7 @@ body {
 .welcome-speech-compact .speech-typing {
   display: inline-block;
   white-space: nowrap;
-  transition: transform 0.8s linear;
+  transition: transform 20s linear;
 }
 .welcome-speech-compact .speech-cursor {
   display: inline-block;
@@ -2788,7 +2788,7 @@ function navigateTo(screenId, isAutoLoop) {
 
 let welcomeAbortController = null;
 let welcomeLoopTimer = null;
-const WELCOME_DISPLAY_MS = 8000;
+const WELCOME_DISPLAY_MS = 25000;
 
 function stopWelcomeLoop() {
   if (welcomeAbortController) { welcomeAbortController.abort(); welcomeAbortController = null; }
@@ -2865,10 +2865,14 @@ async function startWelcomeTyping() {
   notice.className = 'welcome-speech-notice';
   notice.textContent = AI_NOTICE;
   el.appendChild(notice);
-  tickerScroll(container, el);
 
   if (cursor) cursor.style.display = 'none';
   mouth.classList.remove('speaking');
+
+  await new Promise(r => setTimeout(r, 10000));
+  if (signal.aborted) return;
+
+  tickerScroll(container, el);
 
   welcomeLoopTimer = setTimeout(() => startWelcomeTyping(), WELCOME_DISPLAY_MS);
 }
